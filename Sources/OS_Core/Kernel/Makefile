@@ -26,11 +26,12 @@
 # Paths
 #
 EXP_HDR = <export$dir>
+C_EXP_HDR = <cexport$dir>.Global.h
 
 #
 # Generic options:
 #
-MKDIR   = cdir
+MKDIR   = mkdir -p
 AS      = aasm
 CP      = copy
 RM      = remove
@@ -52,7 +53,8 @@ EXPORTS   = ${EXP_HDR}.EnvNumbers \
             ${EXP_HDR}.PublicWS \
             ${EXP_HDR}.RISCOS \
             ${EXP_HDR}.Variables \
-            ${EXP_HDR}.VduExt
+            ${EXP_HDR}.VduExt \
+            ${C_EXP_HDR}.RISCOS
 
 #
 # Generic rules:
@@ -118,5 +120,9 @@ ${EXP_HDR}.VduExt: hdr.VduExt
 
 ${EXP_HDR}.Variables: hdr.Variables
 	${CP} hdr.Variables $@ ${CPFLAGS}
+	
+${C_EXP_HDR}.RISCOS: hdr.RISCOS
+	${MKDIR} ${C_EXP_HDR}
+	perl Build:Hdr2H hdr.RISCOS $@
 
 # Dynamic dependencies:
