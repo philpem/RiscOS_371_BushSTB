@@ -72,10 +72,23 @@ clean:
 export: ${EXPORTS}
 	@echo ${COMPONENT}: export complete
 
-resources:
-	${MKDIR} ${RESDIR}.${COMPONENT}
-	${CP} Resources.${LOCALE}.Messages  ${RESDIR}.${COMPONENT}.Messages  ${CPFLAGS}
+resources: resources-${CMDHELP}
 	@echo ${COMPONENT}: resource files copied
+
+resources_common:
+	${MKDIR} ${RESDIR}.${COMPONENT}
+	Set Kernel$Messages LocalRes:Messages
+	IfThere LocalRes:<UserIF>.Messages Then Set Kernel$Messages LocalRes:<UserIF>.Messages
+	TokenCheck LocalRes:<UserIF>.Messages
+	${CP} <Kernel$Messages>  ${RESDIR}.${COMPONENT}.Messages  ${CPFLAGS}
+	UnSet Kernel$Messages
+
+resources-None: resources_common
+	@
+
+resources-: resources_common
+	TokenCheck LocalRes:Messages
+	print LocalRes:CmdHelp { >> ${RESDIR}.${COMPONENT}.Messages }
 
 ${TARGET}: ${SOURCE} s.TMOSHelp
 	${MKDIR} rm.${MACHINE}

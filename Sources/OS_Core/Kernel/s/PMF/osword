@@ -334,7 +334,11 @@ OsWord0EAlpha ROUT
         CLRPSR  I_bit, R0               ; enable IRQs now
 OSWord0EReturnString
         MOV     R0, R13                 ; point to stacked copy
-        MOV     R2, #25                 ; 24 + CR terminator
+; KJB 07-Sep-98: No-one is guaranteeing anywhere the length of %w3 or %m3 -
+; see PRM 1-402 and 1-415. So give an indefinite buffer length here (making
+; overflow the caller's problem - this call is obsolete anyway). Problem
+; first noted with territory Japan, for which %m3 is potentially 5 bytes long.
+        MOV     R2, #&10000000
         ADR     R3, TimeFormat
         SWI     XOS_ConvertDateAndTime
         ADD     R13, R13, #8            ; junk stack frame
@@ -776,7 +780,35 @@ OsWord0F ROUT
 
      [  {TRUE}                          ; international version uses Territory_ConvertTimeStringToOrdinals
 
-        ADD     r10, r0, #3+1           ; round up number of bytes in block to word boundary, including null terminator
+        TST     R9, #2
+        BEQ     %FT01
+
+; KJB 980908 - can't assume length of date, as %w3, %dy and %m3 may be any length. Unfortunately,
+; the string may not be terminated. Best we can do is plop a terminator at the maximum length position,
+; which will at least cope with territories with fixed-length strings. Territories with variable length
+; strings may work anyway, as territory modules are quite good at ignoring trailing junk. I've
+; fixed things I've spotted that didn't terminate, such as BASIC.
+
+        SUB     SP, SP, #48
+        MOV     R0, #-1
+        MOV     R2, SP                  ; R1 points to real memory - contents don't matter to us
+        SWI     XTerritory_ReadCalendarInformation
+        ADDVS   SP, SP, #48
+        BVS     Bad0F
+
+; need to work out maximum length of "%w3,%dy %m3 %ce%yr[.%24:%mi:%se]"
+        TST     R9, #1
+        MOVEQ   R0, #7                  ; length of ",  %ce%yr"
+        MOVNE   R0, #16                 ; length of ",  %ce%yr.%24:%mi:%se"
+        LDR     R10, [R2, #24]
+        LDR     R14, [R2, #28]
+        ADD     R0, R0, R10             ; + max length of %w3
+        LDR     R10, [R2, #40]
+        ADD     R0, R0, R14             ; + max length of %dy
+        ADD     R0, R0, R10             ; + max length of %m3
+        ADD     SP, SP, #48
+
+01      ADD     r10, r0, #3+1           ; round up number of bytes in block to word boundary, including null terminator
         BIC     r10, r10, #3
         SUB     sp, sp, r10
 

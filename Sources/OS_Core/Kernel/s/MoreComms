@@ -138,14 +138,21 @@ Eval_Code ROUT
 
 Time_Code    ROUT
      Push   "lr"
-     LDR     R1, =GeneralMOSBuffer
-     MOV     R0, #0
+     SUB     R13, R13, #8
+     MOV     R1, R13
+     MOV     R0, #3
      STRB    R0, [R1]
      MOV     R0, #14
      SWI     XOS_Word
-     MOVVC   R0, R1
-     MOVVC   R1, #24
-     SWIVC   XOS_WriteN
+     BVS     %FT01
+     MOV     R0, #-1
+     MOV     R1, R13
+     LDR     R2, =GeneralMOSBuffer
+     MOV     R3, #256
+     ADRL    R4, TimeFormat
+     SWI     XTerritory_ConvertDateAndTime
+01   ADD     R13, R13, #8
+     SWIVC   XOS_Write0
      SWIVC   XOS_NewLine
      Pull   "PC"
 
