@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
         TTL     => Kernel : SWI Despatch, simple SWIs
         SUBT    Arthur Variables
         OPT     4
@@ -158,6 +172,9 @@ DRAM3PhysRam *  &1C000000
 DRAMBaseAddressMask * &1C000000         ; used to mask off bits after stealing video RAM
 PhysSpaceSize * &20000000               ; IOMD physical map is 512M big
 PhysROM *       &00000000               ; and real ROM starts at 0
+ [ STB
+PhysExtROM *	&01000000		; 2nd ROM bank starts at 16M
+ ]
 SAMLength *     512*4                   ; SAM length in bytes for 1 bank of VRAM
 EASISpacePhys * &08000000
 EASISpace *     PhysSpace + EASISpacePhys
@@ -462,8 +479,9 @@ SVCContinue * {PC}-SWIRelocation
         LDR     r11, [r12, #-4]
         BIC     r11, r11, #&FF000000
         Push    r11
-
+        [ StrongARM
 SVC_CallASWI * {PC}-SWIRelocation       ; CallASWI,CallASWIR12 re-entry point
+        ]
 
         BICS    r11, r11, #Auto_Error_SWI_bit
         BEQ     SWIWriteC + SWIRelocation
@@ -612,9 +630,13 @@ JTABLE  & SWIWriteC             ; this entry never gets used (see ^)
  |
         & NoSuchSWI
  ]
+ [ STB
+        & NoSuchSWI
+ |
         & ResyncTimeSWI
+ ]
  [ StrongARM
-        & PlatFeatSWI  
+        & PlatFeatSWI
         & SyncCodeAreasSWI
         & CallASWI
         & AMBControlSWI
@@ -642,6 +664,7 @@ DirtyBranch
 
 ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+ [ StrongARM
 ;StrongARM needs these
 
 ;SWI number passed in r10
@@ -657,6 +680,7 @@ CallASWIR12 ROUT
         BIC     r11, r11, #&FF000000 ;just in case
         STR     r11, [sp, #0]        ;CallASWIR12 now incognito as target SWI
         B       SVC_CallASWI         ;re-dispatch
+ ]
 
 ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -798,12 +822,12 @@ Do_CallBack                                    ; CallBack allowed:
         STR     r14, [r12, #4*15]             ; user PC
         MOV     r14, r12
         Pull   "r10-r12"
-  [ SASTMhatbroken ;arse!
+  [ SASTMhatbroken
         STMIA   r14!,{r0-r12}
         STMIA   r14,{r13,r14}^                ; user registers
         NOP
         SUB     r14,r14,#13*4
-  |    
+  |
         STMIA   r14, {r0-r14}^                ; user registers
   ]
 
@@ -1240,7 +1264,7 @@ VecSwiDespatch ROUT
 ; Update return pulls lr, molests it, then MOVS PC, lr
 ; Note either return enables IRQ, FIQ
 
-; ???? Is the DEFAULT owner allowed to crap on r10,r11 IFF he claims it ????
+; ???? Is the DEFAULT owner allowed to corrupt r10,r11 IFF he claims it ????
 
         Pull    lr                      ; Punter lr has VClear
         BIC     lr, lr, #C_bit          ; Copy C,V to punter lr
@@ -1342,6 +1366,7 @@ Issue_Service_SWI ROUT
         Pull    lr
         B       SLVK
 
+ [ StrongARM
 ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ; SWI XOS_PlatformFeatures
 
@@ -1383,10 +1408,12 @@ platfeat_irqinsert
         ADR     R0,platfeaterror
         B       SLVK_SetV
 
+ ! 0,"amg: renaissance. WARNING! StrongARM conditional code has non-internationalised errors"
 platfeaterror
         DCD     0
         DCB     "bad OS_PlatformFeatures reason code",0
         ALIGN
+  ]
 
 ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ; SWI OS_GenerateError

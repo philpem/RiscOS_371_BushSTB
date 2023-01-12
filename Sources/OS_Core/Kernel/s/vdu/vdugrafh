@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.VduGrafH
 ;
 ; ARTHUR OPERATING SYSTEM - Vdu Drivers
@@ -117,9 +131,9 @@ LoadFile ROUT
         LDR     R3, [sp, #2*4]          ; R3 = load address
         LDR     R1, [R3, #saFirst-4]    ; offset to first sprite must be < length of file
         CMP     R1, R4
-        Pull    "R1-R6, PC",CC          ; R0 is crap, R1-R11 preserved, V=0
+        Pull    "R1-R6, PC",CC          ; R0 is corrupt, R1-R11 preserved, V=0
 
-; it was a crap file, so make it look like an empty sprite area before erroring
+; it was a bad file, so make it look like an empty sprite area before erroring
 ; so that in SLoad case we don't get a naff sprite area.
 
 05
@@ -218,7 +232,7 @@ MergeSpriteAreas ROUT
 
         LDR     R3, [R2, #saFirst]
         ADD     R2, R2, R3
-10                                      ; R1 -> dest area CB, 
+10                                      ; R1 -> dest area CB,
         BL      MergeSprite             ; R2 -> to sprite CB
                                         ; return R2 -> next sprite
         BVS     %FT20                   ; error 'NoRoomToMerge'
@@ -336,7 +350,7 @@ ExtendHorizontally ROUT
 
         BL      InsertWords             ; Insert R3 words at position R4 in
                                         ; sprite, ie at beginning
-        LDR     R5, [R2, #spWidth]            
+        LDR     R5, [R2, #spWidth]
         ADD     R5, R5, #1              ; new spWidth
         STR     R5, [R2, #spWidth]
 
@@ -392,7 +406,7 @@ ReduceHorizontally ROUT
         LDR     R9, [R2, #spImage]
         ADD     R9, R9, R2              ; to
         MOV     R10, R9                 ; from
-        LDR     R5, [R2, #spWidth]            
+        LDR     R5, [R2, #spWidth]
 10
         MOV     R11, R5, LSL #2
                                         ; move one row
@@ -414,7 +428,7 @@ ReduceHorizontally ROUT
 
         BL      RemoveWords
 
-        LDR     R5, [R2, #spWidth]            
+        LDR     R5, [R2, #spWidth]
         SUB     R5, R5, #1              ; new spWidth
         STR     R5, [R2, #spWidth]
 20
@@ -718,18 +732,18 @@ ReadPixelColour ROUT
         Pull    PC, VS                  ;         Address, Bit position
         LDR     R5, [R6]                ; word from sprite
         LDR     R6, [WsPtr, #SprReadNColour]
-                    
+
         CMP     R6, #63                 ; check for 256 colour
         MOVEQ   R6, #255
 
         AND     R0, R6, R5, LSR R7      ; extract one pixel (bit0..)
-             
+
         CMP     R6, #255
 
         MOVNE   R2, R0                  ; colour = pixel
-        MOVNE   R3, #0                  ; tint   = 0 
-        BNE     %FT10                 
-        
+        MOVNE   R3, #0                  ; tint   = 0
+        BNE     %FT10
+
         ;now check for size of palette
         ADD     R2, R2, #spImage        ; point to image/mask start
         LDMIA   R2, {R2, R3}
@@ -737,17 +751,17 @@ ReadPixelColour ROUT
         MOVGT   R3, R3
         SUB     R2, R2, #spPalette
         CMP     R2, #&0800
-                  
+
         ;see comment below - for this call to work we have to temporarily
         ;set NColour to SprReadNColour
 
         LDRNE   R8,[WsPtr,#NColour]
         STRNE   R6,[WsPtr,#NColour]
-        
+
         BLNE    ExtractTintAndColour    ; else extract colour & tint from pixel
 
         STRNE   R8,[WsPtr,#NColour]
-        
+
         MOVEQ   R2, R0
         MOVEQ   R3, #0
 10
@@ -774,7 +788,7 @@ ReadPixelColour ROUT
 
 ; amg: note. need to handle full palettes differently here - since the GCOL and TINT
 ; model should not apply. Check for a full palette on an 8bpp sprite and deal with
-; it accordingly. 
+; it accordingly.
 ; amg: bug fix to MED-01885. Although ReadPixel and WritePixel use SprReadNColour,
 ; then call AddTintToColour which uses NColour - being the screen's value not the
 ; sprites. Therefore, the safest fix this near freeze is to simply temporarily change
@@ -783,13 +797,13 @@ ReadPixelColour ROUT
 WritePixelColour ROUT
         Push    "R1-R4, R14"
         LDR     R8, [WsPtr, #SprReadNColour]
-        
+
         AND     R0, R5, R8              ; limit colour to 0..NColour
-        
+
         CMP     R8, #63                 ; check for 256 colours
-        CMPNE   R8, #255                            
-        BNE     %FT08                   ; despatch non 8bpp       
-        
+        CMPNE   R8, #255
+        BNE     %FT08                   ; despatch non 8bpp
+
         ;now need to determine size of 8bpp sprite's palette
         ADD     R3, R2, #spImage        ; point to image/mask start
         LDMIA   R3, {R2, R3}            ; fetch them
@@ -797,19 +811,19 @@ WritePixelColour ROUT
         MOVGT   R2, R3                  ; use the lesser
         SUB     R2, R2, #spPalette      ; subtract start offset
         CMP     R2, #&800
-        
-        MOVNE   R3, R6                  ; then combine     
-        
+
+        MOVNE   R3, R6                  ; then combine
+
         ;see comment above - for this call to work we have to temporarily
         ;set NColour to SprReadNColour
-        
+
         LDRNE   R7,[WsPtr,#NColour]
         STRNE   R8,[WsPtr,#NColour]
-        
+
         BLNE    AddTintToColour         ; colour & tint
-        
+
         STRNE   R7,[WsPtr,#NColour]
-        
+
         B       %FT05                   ; 8 bpp take this branch
 08
         ADDCC   R0, R0, R8              ; else index into full colour table
@@ -823,7 +837,7 @@ WritePixelColour ROUT
         CMP     LR, #6
         MOV     R5, R0
         BCS     %FT06                   ; 32 bpp takes this branch
-        
+
         B       %FT07                   ; and 16 bpp takes this one
 05
         ORR     R5, R0, R0, LSL #8      ; expand byte value into a word
@@ -866,12 +880,12 @@ ReadPixelMask ROUT
         BL      SpriteMaskAddr          ; returns R6,      R7
         Pull    PC, VS                  ;         Address, Bit position
         LDR     R5, [R6, R5]            ; word from mask
-        
+
         LDR     LR, [R2, #spMode]       ; check for 1bpp masks
         MOVS    LR, LR, LSR #27
         MOVNE   R6, #1
         LDREQ   R6, [WsPtr, #SprReadNColour]
-        
+
         ANDS    R5, R6, R5, LSR R7      ; extract one mask pixel (bit0..)
         MOVNE   R5, #1
 10
@@ -942,17 +956,17 @@ WritePixelMask ROUT
 
 SpriteMaskAddr ROUT
         Push    "R1-R5, R8-R11, LR"
-        
+
         LDR     LR, [R2, #spMode]
         MOVS    LR, LR, LSR #27         ; get the sprite type from the mode word
         BEQ     %FT10                   ; branch: old format, use old routine as is
-        
+
         ADD     R5, R2, #spWidth
         LDMIA   R5, {R5-R8}             ; R5     ,R6      ,R7    ,R8
                                         ; spWidth,spHeight,spLBit,spRBit
         SUBS    R4, R6, R4              ; invert Y coord
         BCC     %FT90                   ; must be in range 0..spHeight
-        
+
         BL      GetMaskspWidth          ; change R5 to suit the mask width
                                         ; and R8 to new last bit used
 
@@ -966,9 +980,9 @@ SpriteMaskAddr ROUT
 
         B       %FT20                   ; and continue in the old code
 
-SpriteGenAddr 
+SpriteGenAddr
         Push    "R1-R5, R8-R11, LR"
-10        
+10
         ADD     R5, R2, #spWidth
         LDMIA   R5, {R5-R8}             ; R5     ,R6      ,R7    ,R8
                                         ; spWidth,spHeight,spLBit,spRBit
@@ -1023,7 +1037,7 @@ SpriteGenAddr
 ;
 ; in:   R5 = spWidth (ie width in words-1)
 ;       (expects R2->sprite)
-;                                                                    
+;
 ; out:  R5 = spWidth (words -1) for mask data
 ;       R8 modified for new last bit used in mask data
 
@@ -1031,32 +1045,32 @@ SpriteGenAddr
 
 ;NOTE: If any changes are made to this routine, please look at the SpriteExtend
 ;source too, as there is a very similiar routine there too (in SprAdjSize). WT
-                
+
 GetMaskspWidth ROUT
         Push    "R0,LR"
-        
+
         LDR     LR, [R2, #spMode]       ; fetch the sprite mode
         MOVS    LR, LR, LSR #27         ; isolate the sprite type and test for =0
-        
+
         Pull    "R0,PC",EQ              ; if an old format sprite, return R5 unchanged
-                                             
+
         ; treat any T>max sprites as 32bpp
         CMP     LR, #SpriteType_MAX
         MOVCS   LR, #SpriteType_Substitute
-        
+
         ; bugfix 9/8/93: get log2bpp this way
         ADRL    R0, NSM_bpptable-4
         LDR     LR, [R0, LR, LSL #2]    ; get the log2bpp to LR
-        
+
         RSB     LR, LR, #5              ; and change to 5-log2bpp
 
         MOV     R5, R5, LSL LR          ; number of pixels for full words
-                                           
+
         RSB     LR, LR, #5              ; now switch back to log2bpp
-        LDR     R0, [R2, #spRBit] 
+        LDR     R0, [R2, #spRBit]
         ADD     R0, R0, #1
         ADD     R5, R5, R0, LSR LR
-        
+
         ANDS    LR, R5, #&1F            ; fit exactly in a number of words ?
         SUB     R8, LR, #1              ; alter the last bit used for the mask data
                                         ; fix bug MED-01130....
@@ -1064,7 +1078,7 @@ GetMaskspWidth ROUT
         MOVNE   LR, #1                  ; if not, add an extra word
         ADD     R5, LR, R5, LSR #5      ; add the whole number of words
         SUB     R5, R5, #1              ; returns as words-1
-        
+
         Pull    "R0,PC"
 
 
@@ -1152,12 +1166,12 @@ LHWastageEntry
 ; ******************************************************************************
 ;
 ;        bounce_new_format_masks - object to masks on new format sprites
-;               
+;
 ;        enter with R2->sprite
 ;        either returns with all registers preserved, or VS and R0->error
 
 bounce_new_format_masks ROUT
-        STMFD   R13!,{R0,R14} 
+        STMFD   R13!,{R0,R14}
         LDR     LR, [R2, #spMode]       ; fetch the sprites mode
         MOVS    LR, LR, LSR #27         ; set NE if new format
         LDMEQFD R13!,{R0,R15}           ; out now if old format
@@ -1166,8 +1180,8 @@ bounce_new_format_masks ROUT
         ADRL    R0, SpriteErr_NoMaskOrPaletteAllowedInThisDepth
         [ International
         BL      TranslateError
-        ] 
-        SETV             
+        ]
+        SETV
         STR     R0,[R13]
         STR     R0,[WsPtr, #RetnReg0]
         LDMFD   R13!,{R0,R15}

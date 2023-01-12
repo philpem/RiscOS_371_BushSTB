@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.Vdu23
 
 ; *****************************************************************************
@@ -140,14 +154,14 @@ Vdu23_17
         EOR     R1, R1, R3
         TST     R1, #&C0                        ; are top two bits different ?
         MOVEQ   PC, R14                         ; no need to redo table
-                                          
+
         ; amg: use R1 here instead of 'bpp' which is R0. I need R0 in a moment.
         LDR     R1, [WsPtr, #BitsPerPix]
         CMP     R1, #8                          ; are we in 8 bits-per-pixel or more?
         MOVCC   PC, R14                         ; no, then exit
-                               
+
         Push    "lr"
-                                     
+
         ; amg: only do foreground or background as appropriate
         CMP     R0,#1
         BLNE    CompileTextFg
@@ -168,7 +182,7 @@ SwapColours ROUT
         LDR     R2, [WsPtr, #TBackCol]
         STR     R1, [WsPtr, #TBackCol]
         STR     R2, [WsPtr, #TForeCol]
-                                          
+
         LDR     R1, [WsPtr, #TextFgColour]
         LDR     R2, [WsPtr, #TextBgColour]
         STR     R1, [WsPtr, #TextBgColour]
@@ -1536,7 +1550,7 @@ Vdu23_0_13
 ; *****************************************************************************
 ;
 ;       Vdu23_9  - Equivalent of FX 9
-;       Vdu23_10 - Equivalent of FX 10 
+;       Vdu23_10 - Equivalent of FX 10
 ;
 ; in:   R0 = 9 or 10
 ;

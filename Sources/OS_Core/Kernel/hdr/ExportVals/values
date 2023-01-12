@@ -1,4 +1,24 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ARM stand alone Macro Assembler Version 2.00
+AMBControl_ws  at  00000175
+ARMA_Cleaner_flipflop at 00000179
+SyncCodeA_sema (byte) at 0000017D
+VideoPhysAddr held at  00000180
+ProcessorType  at  00000235
+ProcessorFlags at  00000236
 Label Export_BgEcfOraEor has the value &000004C0
 Label Export_FgEcfOraEor has the value &00000480
 Label Export_BranchToSWIExit has the value &01F037FC
@@ -21,3 +41,4 @@ Label Export_VduDriverWorkSpace has the value &00001000
 Label VDWSSize has the value &00003000
 Label ScreenBlankFlag has the value &0000047C
 Label ScreenBlankDPMSState has the value &0000047D
+Label Export_ResetType has the value &00000174

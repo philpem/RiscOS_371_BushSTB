@@ -1,5 +1,18 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > ARM600
-
 
         GBLL    DebugAborts
 DebugAborts SETL {FALSE}
@@ -13,7 +26,7 @@ DebugAborts SETL {FALSE}
 ; Created by TMD 15-Jul-92
 ; Comments updated by TMD 04-Aug-93
 
-;24-01-96 MJS  now effectively codes for ARM 6 onwards (6,7,8,A, where A = StrongARM) 
+;24-01-96 MJS  now effectively codes for ARM 6 onwards (6,7,8,A, where A = StrongARM)
 ;              but ARM8 not properly supported (not needed for RO 3.70)
 ;07-10-96 MJS  proper support for ARM810 added
 
@@ -46,6 +59,22 @@ DebugAborts SETL {FALSE}
 ; (on IOMD we allow this to be in any of the 4 RAM sites, ie you don't have to have RAM in any particular SIMM site)
 ; Consequently the base of the fixed system pages is not known at assembly time, so has to be passed in a register
 ; to the generic code.
+;
+; amg 7/12/96 Renaissance, import changes below from Spinner tree, but this is fundamentally the
+; 3.70 file.
+
+; 17-Jun-96	BAR	Change speed settings for the second bank of ROM space.
+; 09-Jul-96     BAR     Improve IOMD ID vsn code - two places.
+;                       Change ROM Speed settings for 7500FE and non-7500FE parts.
+; 25-Jul-96	BAR	Correct bug in video bandwidth code, wrong label used.
+; 16-Aug-96	JRH	Programming of 2nd ROM bank (IOMD ROMCR1 register):
+;				reinstated ExtROMSupport code, added CanLiveOnROMCard code
+;			MemInitTable:
+;				If ExtROMSupport: added assertion that ImageSize <= 4096
+;				and maps 4MB of each ROM bank.
+;				Otherwise: always maps 8MB of ROM space independant of ImageSize
+
+
 
 ; Fixed page allocation is as follows
 
@@ -66,7 +95,7 @@ StaticPagesSize         *       @
 L2PT                    *       &02C00000       ; size 256K
 L1PT                    *       &02C0C000       ; in the middle of L2PT, where the mapping for 03000000 to 03FFFFFF would be
 
-FixedAreasL2Size        *       96*1024        ; amount of L2 to cover fixed areas, excluding free pool   
+FixedAreasL2Size        *       96*1024        ; amount of L2 to cover fixed areas, excluding free pool
 
 UndStackSoftCamChunk    *       &01E00000
 UndStackSize            *       8*1024
@@ -171,10 +200,12 @@ SetDAG  ENTRY   "r0-r1,r12"
         ORRCS   r0, r0, #IOMD_DMA_L_Bit
         STR     r0, [r12, #IOMD_VIDINIT]
 
+        [ :LNOT: STB
         MOV     r1, #0
         LDRB    r1, [r1, #LCD_Active]
         TST     r1, #&80
         EXIT    EQ                              ;Exit if not a dual-panel LC display
+        ]
 
         ;Otherwise, we are going to have to update VIDINITB too...
         MOV     r1, #VduDriverWorkSpace
@@ -216,10 +247,12 @@ SetDAG  ENTRY   "r0-r1,r12"
         STR     r14, [r12, #IOMD_VIDINIT]       ; store VInit
         STR     r0, [r12, #IOMD_VIDEND]         ; and VEnd
 
+        [ :LNOT: STB
         MOV     r14, #0
         LDRB    r14, [r14, #LCD_Active]
         TST     r14, #&80
         EXIT    EQ                              ; Not a dual-panel LCD so no need to hang around....
+        ]
 
         ;Check whether we need to update VIDINITB or not...
 
@@ -448,7 +481,7 @@ BangL2PT_noARM810flush
         ARM_read_ID r4
         AND     r4,r4,#&F000                    ;ARM ID nibble in r4
   ]
-        CMP     r0,#0     
+        CMP     r0,#0
         BEQ     BangL2PT_mapout                 ;the update is a map out => cache(s) may need clean/flush
 ;else update is a map in (and nothing should be there at the moment) => no cache worries
         CMP     r4,#&A000
@@ -654,10 +687,12 @@ SSETMEMC ROUT
         LDRB    r11, [r12, #IOMD_VIDCR]
         AND     r11, r11, #(&7F :AND: :NOT: IOMD_VIDCR_Enable)  ; knock out bit 7 and video DMA enable bit
         ORRNE   r11, r11, #IOMD_VIDCR_Enable
+  [ :LNOT: STB
         MOV     r10, #0
         LDRB    r10, [r10, #LCD_Active]
         TST     r10, #&80
         ORRNE   r11, r11, #IOMD_VIDCR_Dup                       ;Set bit 7 if we're on an LCD dual-panel display
+  ]
         Pull    "r10"
         STRB    r11, [r12, #IOMD_VIDCR]
  |
@@ -776,7 +811,7 @@ ClearPhysRAM ROUT
         BNE     %BT10
 
   [ ClearPhysRAMspeedup
-        MOV     r12,#48 
+        MOV     r12,#48
         LDMIA   r12,{r7-r9,r13}                         ;restore
         MOV     r12,#32                                 ;clear our speed up workspace
         STMIA   r12!,{r0-r3}
@@ -890,7 +925,9 @@ InitMEMC ROUT
 
         MOV     r12, #IOMD_Base
 
- [ MorrisSupport
+; amg: drop in FE-aware routine, leave old one here for reference
+
+  [ MorrisSupport
 ; Perform a dummy write to IOMD (some harmless register) to get it out of ROM force mode.
 ; Reads from IOMD will return garbage before this has happened. If we're actually running out
 ; of 32-bit wide ROMs on MORRIS, a write will already have happened, to get ROMCR0 from
@@ -899,73 +936,166 @@ InitMEMC ROUT
 
         STRB    r12, [r12, #IOMD_DMAREQ]              ; writes to DMAREQ are ignored
 
-        LDRB    r0, [r12, #IOMD_ID0]
-        CMP     r0, #&E7
-        LDRB    r0, [r12, #IOMD_ID1]
-        CMPEQ   r0, #&D4
-       ;MOVEQ   r3, #xxxx
-        BEQ     MedusaInit                            ; Medusa, else assume Morris
-;
-; MORRIS contains IOMD equivalant circuitry. Due to lack of VRAM, presence of 16/32 bit support
-; and a different ROM speed register, we program it slightly differently.
-;
+        LDRB    r2,[r12,#IOMD_ID1]	; load r2 with IOMD ID high byte
+        LDRB    r0,[r12,#IOMD_ID0]	; load r0 with IOMD ID low byte
+        ORR     r0,r0,r2, LSL #8	; Or r0 and r2 - shifted left 8, put in r0
+        LDR     r2,=IOMD_7500		; get Ref IOMD ID code for IOMD in a 7500
+        CMPS    r0,r2                   ; check for IOMD ID Code for IOMD in a 7500
+	BEQ	init7500cpu		; If equal, got to init7500cpu
+
+        LDRNE   r2,=IOMD_7500FE		; If not, get ID code for IOMD in a 7500FE
+        CMPNES  r0,r2			; If not, check for IOMD ID Code for IOMD in a 7500FE
+        BNE     MedusaInit              ; NOT MORRIS assume Medusa hardware
+
+
+init7500FEcpu
+; Here bceause its an ARM7500 'FE' variant
+; Program the CPU, Memory and IO clock prescalers
+; Set the prescalers to :-
 
   [ RO371Timings
-        ;IOMD_ID1 still in r0 - check for 7500FE
-        CMP     r0, #&aa         ; EQ if 7500FE   => assume 64 MHz bus, EDO RAM
-                                 ; NE assume 7500 => assume 32 MHz bus
-;7500FE
-;set memory to 32MHz for early boot (avoid probs with POST and with power-on key detection)
-        MOVEQ   r0, #&12                 ; 5-3 cycle ROM access, Half speed (ie. 10-6)
-        STREQB  r0, [r12, #IOMD_ROMCR0]
-        STREQB  r0, [r12, #IOMD_ROMCR1]
-        MOVEQ   r0, #&70                 ; EDO RAM selected, 32 bit wide, conservative RAS,CAS timing
-        STREQB  r0, [r12, #IOMD_DRAMWID] ; DRAM control reg. (more than just width on FE) 
-        MOVEQ   r0, #&04                 ; clock dividers: /1 for CPU, /2 for memory, /2 for I/O 
-        STREQB  r0, [r12, #IOMD_CLKCTL]
-;7500
-        MOVNE   r0, #&32                 ; 5-3 cycle ROM access
-        STRNEB  r0, [r12, #IOMD_ROMCR0]
-        STRNEB  r0, [r12, #IOMD_ROMCR1]
-        MOVNE   r0, #&07                 ; clock dividers: /1 for I/O, /1 for CPU, /1 for memory    
-        STRNEB  r0, [r12, #IOMD_CLKCTL]
-
-  | ;else if not RO371Timings
+;	CPUCLK divide by 1
+;	MEMCLK divide by 2
+;	IOCLK  divide by 2
 ;
-; PSwindell wants all prescalers set to divide by 1
+	MOV     r0, #IOMD_CLKCTL_CpuclkNormal + IOMD_CLKCTL_MemclkHalf + IOMD_CLKCTL_IOclkHalf
+  |
+;	CPUCLK divide by 2
+;	MEMCLK divide by 1
+;	IOCLK  divide by 1
+;
+	MOV     r0, #IOMD_CLKCTL_CpuclkHalf + IOMD_CLKCTL_MemclkNormal + IOMD_CLKCTL_IOclkNormal
+  ]
+        STRB    r0, [r12, #IOMD_CLKCTL] ; initialise all the prescalers.
+;
+; Set ROM speed, take care to preserve 16-bit mode bit...
+;
+; According to BSiddle on the 15-May-96, Omega will use burst mode roms: use 93nS burst, 156nS initial.
+; According to TDobson on the 09-Jul-96, Omega will handle ROMS up to 120nS and 70nS.
+; Thus the ROM speed should be initilised to :-
+; Half Speed or H bit, clear, which is ON ! : Half the delays, thus DOUBLE all clock ticks.
+; Non-Sequental delay : 10 Ticks : Half speed on, so select 5 ticks (5*2)
+; Burst delay         :  8 Ticks : Half speed on, so select 4 ticks (4*2)
+; Remember the Memory clock on Omega is faster than on previous products.
+; The fast flash devices used for Omega testing should be able to cope even
+; though they aren't burst devices.
+        LDRB    r0, [r12, #IOMD_ROMCR0]         ; Get contents of ROMCR0 in to r0
+        AND     r0, r0, #&40                    ; clear all but the 16-bit mode flag
+  [ RO371Timings
+        ORR     r0, r0, #IOMD_ROMCR_HalfSpeed + IOMD_ROMCR_NSTicks_5 + IOMD_ROMCR_BTicks_3
+  |
+        ORR     r0, r0, #IOMD_ROMCR_HalfSpeed + IOMD_ROMCR_NSTicks_5 + IOMD_ROMCR_BTicks_4
+  ]
+        STRB    r0, [r12, #IOMD_ROMCR0]         ; Prog. the reg.s
+
+; Program the 2nd ROM bank
+  [ ExtROMSupport
+;   Unless we're actually running from the 2nd ROM bank (CanLiveOnROMCard), we don't know how fast
+;   the extension ROM in the 2nd bank goes, so program it for a slow default speed
+    [ CanLiveOnROMCard
+	TST	pc, #PhysExtROM			; are we running out of the 2nd ROM bank?
+        STRNEB	r0, [r12, #IOMD_ROMCR1]		; Program the 2nd bank the same as the 1st
+      [ ExtROMis16bit
+	MOVEQ	r0, #IOMD_ROMCR_HalfSpeed + IOMD_ROMCR_16bit + IOMD_ROMCR_NSTicks_7 + IOMD_ROMCR_BurstOff
+      |
+	MOVEQ	r0, #IOMD_ROMCR_HalfSpeed + IOMD_ROMCR_32bit + IOMD_ROMCR_NSTicks_7 + IOMD_ROMCR_BurstOff
+      ]
+	STREQB	r0, [r12, #IOMD_ROMCR1]
+    |;CanLiveOnROMCard
+      [ ExtROMis16bit
+	MOV	r0, #IOMD_ROMCR_HalfSpeed + IOMD_ROMCR_16bit + IOMD_ROMCR_NSTicks_7 + IOMD_ROMCR_BurstOff
+      |
+	MOV	r0, #IOMD_ROMCR_HalfSpeed + IOMD_ROMCR_32bit + IOMD_ROMCR_NSTicks_7 + IOMD_ROMCR_BurstOff
+      ]
+	STRB	r0, [r12, #IOMD_ROMCR1]
+    ];CanLiveOnROMCard
+
+  |;ExtROMSupport
+    [ CanLiveOnROMCard
+        STRB	r0, [r12, #IOMD_ROMCR1]		; Program the 2nd bank the same as the 1st
+    |
+        STRB	r0, [r12, #IOMD_ROMCR1]		; 2nd bank unused: program it the same anyway
+    ]
+  ];ExtROMSupport
+
+; Now program ASTCR to add wait states, since MEMCLK is fast relative to IOCLK
+
+	MOV	r0, #IOMD_ASTCR_WaitStates
+	STRB	r0, [r12, #IOMD_ASTCR]
+
+	B	init7500cpu_common		; branch to common init code.
+;
+
+init7500cpu
+; Here because its an ARM7500 variant - NON 'FE' device.
+; Program the CPU, Memory and IO clock prescalers
+; Set the prescalers to :-
+;	CPUCLK divide by 1
+;	MEMCLK divide by 1
+;	IOCLK  divide by 1
 ;
         MOV     r0, #IOMD_CLKCTL_CpuclkNormal + IOMD_CLKCTL_MemclkNormal + IOMD_CLKCTL_IOclkNormal
         STRB    r0, [r12, #IOMD_CLKCTL] ; initialise all prescalers to div1
-
 ;
-; Set ROM speed, take care to preserve 16-bit mode bit, or all hell breaks loose...
+; Set ROM speed, take care to preserve 16-bit mode bit...
 ;
 ; According to RJKing on 6/5/94, Kryten will use burst mode roms: use 93nS burst, 156nS initial.
-;
-; We assume that the extension ROMs are the same access time and width as the main OS ROMS.
-;
-        LDRB    r0, [r12, #IOMD_ROMCR0]
-        AND     r0, r0, #&40            ; clear all but 16-bit mode bit, giving us the slowest ROMs possible
- [ :LNOT: AutoSpeedROMS
-  [ NormalSpeedROMS
-   ;Normal code
-        ORR     r0, r0, #IOMD_ROMCR_Normal + IOMD_ROMCR_156 + IOMD_ROMCR_Burst93
-                                                                ; initialise ROM speed to 156.25nS, 93.75nS burst
-        ; the fast EPROMS used for Kryten testing should be able to cope even though they aren't
-        ; burst devices
+; According to BSiddle on 09-Jul-96 - Omenga will need to set the burst speed to 4 ticks from 3 ticks.
+; Thus the ROM speed should be initilised to :-
+; Half Speed or H bit, Set, which is OFF ! : Don't half the delays.
+; Non-Sequental delay :  5 Ticks : Half speed off, so select 5 ticks
+; Burst delay         :  4 Ticks : Half speed off, so select 4 ticks
+; The fast EPROMS used for Kryten testing should be able to cope even though
+; they aren't burst devices
+
+        LDRB    r0, [r12, #IOMD_ROMCR0]          ; Get contents of ROMCR0 in to r0
+        AND     r0, r0, #&40                    ; clear all but the 16-bit mode flag
+  [ RO371Timings
+        ORR     r0, r0, #IOMD_ROMCR_Normal + IOMD_ROMCR_NSTicks_5 + IOMD_ROMCR_BTicks_3
   |
-   ;Slow ROM access for PSwindells test EPROMS. Paul requested 156nS (or slower), burst off.
-        ORR     r0, r0, #IOMD_ROMCR_Normal + IOMD_ROMCR_187 + IOMD_ROMCR_BurstOff
-
-        ! 0, "*** WARNING *** Slow ROM version ment for PSwindell"
+        ORR     r0, r0, #IOMD_ROMCR_Normal + IOMD_ROMCR_NSTicks_5 + IOMD_ROMCR_BTicks_4
   ]
- ]
+        STRB    r0, [r12, #IOMD_ROMCR0]          ; Prog. the reg.s
 
-        STRB    r0, [r12, #IOMD_ROMCR0]
-        STRB    r0, [r12, #IOMD_ROMCR1]         ; and do the same for extension ROMs (just in case)
+; Program the 2nd ROM bank
+  [ ExtROMSupport
+;   Unless we're actually running from the 2nd ROM bank (CanLiveOnROMCard), we don't know how fast
+;   the extension ROM in the 2nd bank goes, so program it for a slow default speed
+    [ CanLiveOnROMCard
+	TST	pc, #PhysExtROM			; are we running out of the 2nd ROM bank?
+        STRNEB	r0, [r12, #IOMD_ROMCR1]		; Program the 2nd bank the same as the 1st
+      [ ExtROMis16bit
+	MOVEQ	r0, #IOMD_ROMCR_Normal + IOMD_ROMCR_16bit + IOMD_ROMCR_NSTicks_7 + IOMD_ROMCR_BurstOff
+      |
+	MOVEQ	r0, #IOMD_ROMCR_Normal + IOMD_ROMCR_32bit + IOMD_ROMCR_NSTicks_7 + IOMD_ROMCR_BurstOff
+      ]
+	STREQB	r0, [r12, #IOMD_ROMCR1]
+    |;CanLiveOnROMCard
+      [ ExtROMis16bit
+	MOV	r0, #IOMD_ROMCR_Normal + IOMD_ROMCR_16bit + IOMD_ROMCR_NSTicks_7 + IOMD_ROMCR_BurstOff
+      |
+	MOV	r0, #IOMD_ROMCR_Normal + IOMD_ROMCR_32bit + IOMD_ROMCR_NSTicks_7 + IOMD_ROMCR_BurstOff
+      ]
+	STRB	r0, [r12, #IOMD_ROMCR1]
+    ];CanLiveOnROMCard
 
-  ] ;RO371Timings conditional
+  |;ExtROMSupport
+    [ CanLiveOnROMCard
+        STRB	r0, [r12, #IOMD_ROMCR1]		; Program the 2nd bank the same as the 1st
+    |
+        STRB	r0, [r12, #IOMD_ROMCR1]		; 2nd bank unused: program it the same anyway
+    ]
+  ];ExtROMSupport
 
+; Now program ASTCR to *NOT* add wait states, since MEMCLK is slow relative to IOCLK
+
+	MOV	r0, #IOMD_ASTCR_Minimal
+	STRB	r0, [r12, #IOMD_ASTCR]
+
+;
+;
+init7500cpu_common
+; Common setup requirments for BOTH 7500 and 7500FE.
 ;
 ; MORRIS doesn't support VRAM. Kryten has same DRAM speed as Medusa
 ;
@@ -978,15 +1108,87 @@ InitMEMC ROUT
         MOV     r0, #0                          ; Podule manager wants TypeA setting by default for all podules
         STRB    r0, [r12, #IOMD_ECTCR]
 
- [ Select16BitSound
-; All MORRIS based machines have 16bit 'Japanese' format sound DAC's
+   [ Japanese16BitSound :LAND: STB
         MOV     r0, #2_10
         STRB    r0, [r12, #IOMD_VIDMUX]
- ]
+   ]
         B       CommonInit
 
 MedusaInit
- ]
+  ] ; MorrisSupport
+
+; amg renaissance ->  [ MorrisSupport
+; amg renaissance -> ; Perform a dummy write to IOMD (some harmless register) to get it out of ROM force mode.
+; amg renaissance -> ; Reads from IOMD will return garbage before this has happened. If we're actually running out
+; amg renaissance -> ; of 32-bit wide ROMs on MORRIS, a write will already have happened, to get ROMCR0 from
+; amg renaissance -> ; 16 to 32-bit wide mode, but we can't yet determine for sure (by reading it back), so do it
+; amg renaissance -> ; anyway.
+; amg renaissance ->
+; amg renaissance ->         STRB    r12, [r12, #IOMD_DMAREQ]              ; writes to DMAREQ are ignored
+; amg renaissance ->
+; amg renaissance ->         LDRB    r0, [r12, #IOMD_ID0]
+; amg renaissance ->         CMP     r0, #&98
+; amg renaissance ->         LDRB    r0, [r12, #IOMD_ID1]
+; amg renaissance ->         CMPEQ   r0, #&5B
+; amg renaissance ->        ;MOVEQ   r3, #xxxx
+; amg renaissance ->         BNE     MedusaInit                            ; NOT MORRIS assume Medusa hardware
+; amg renaissance -> ;
+; amg renaissance -> ; MORRIS contains IOMD equivalant circuitry. Due to lack of VRAM, presence of 16/32 bit support
+; amg renaissance -> ; and a different ROM speed register, we program it slightly differently.
+; amg renaissance -> ;
+; amg renaissance ->
+; amg renaissance -> ;
+; amg renaissance -> ; PSwindell wants all prescalers set to divide by 1
+; amg renaissance -> ;
+; amg renaissance ->         MOV     r0, #IOMD_CLKCTL_CpuclkNormal + IOMD_CLKCTL_MemclkNormal + IOMD_CLKCTL_IOclkNormal
+; amg renaissance ->         STRB    r0, [r12, #IOMD_CLKCTL] ; initialise all prescalers to div1
+; amg renaissance ->
+; amg renaissance -> ;
+; amg renaissance -> ; Set ROM speed, take care to preserve 16-bit mode bit...
+; amg renaissance -> ;
+; amg renaissance -> ; According to RJKing on 6/5/94, Kryten will use burst mode roms: use 93nS burst, 156nS initial.
+; amg renaissance -> ;
+; amg renaissance -> ; We assume that the extension ROMs are the same access time and width as the main OS ROMS.
+; amg renaissance -> ;
+; amg renaissance ->         LDRB    r0, [r12, #IOMD_ROMCR0]
+; amg renaissance ->         AND     r0, r0, #&40            ; clear all but 16-bit mode bit, giving us the slowest ROMs possible
+; amg renaissance ->  [ :LNOT: AutoSpeedROMS
+; amg renaissance ->   [ NormalSpeedROMS
+; amg renaissance ->    ;Normal code
+; amg renaissance ->         ORR     r0, r0, #IOMD_ROMCR_Normal + IOMD_ROMCR_156 + IOMD_ROMCR_Burst93
+; amg renaissance ->                                                                 ; initialise ROM speed to 156.25nS, 93.75nS burst
+; amg renaissance ->         ; the fast EPROMS used for Kryten testing should be able to cope even though they aren't
+; amg renaissance ->         ; burst devices
+; amg renaissance ->   |
+; amg renaissance ->    ;Slow ROM access for PSwindells test EPROMS. Paul requested 156nS (or slower), burst off.
+; amg renaissance ->         ORR     r0, r0, #IOMD_ROMCR_Normal + IOMD_ROMCR_187 + IOMD_ROMCR_BurstOff
+; amg renaissance ->
+; amg renaissance ->         ! 0, "*** WARNING *** Slow ROM version ment for PSwindell"
+; amg renaissance ->   ]
+; amg renaissance ->  ]
+; amg renaissance ->         STRB    r0, [r12, #IOMD_ROMCR0]
+; amg renaissance ->         STRB    r0, [r12, #IOMD_ROMCR1]         ; and do the same for extension ROMs (just in case)
+; amg renaissance -> ;
+; amg renaissance -> ; MORRIS doesn't support VRAM. Kryten has same DRAM speed as Medusa
+; amg renaissance -> ;
+; amg renaissance ->         MOV     r0, #IOMD_VREFCR_REF_16                         ; select 16µs refresh
+; amg renaissance ->         STRB    r0, [r12, #IOMD_VREFCR]
+; amg renaissance ->
+; amg renaissance ->         MOV     r0, #IOMD_IOTCR_Network_TypeA :OR: IOMD_IOTCR_Combo_TypeB :OR: IOMD_IOTCR_Sound_TypeB :OR: IOMD_IOTCR_Sound_Word
+; amg renaissance ->         STRB    r0, [r12, #IOMD_IOTCR]
+; amg renaissance ->
+; amg renaissance ->         MOV     r0, #0                          ; Podule manager wants TypeA setting by default for all podules
+; amg renaissance ->         STRB    r0, [r12, #IOMD_ECTCR]
+; amg renaissance ->
+; amg renaissance ->  [ Select16BitSound
+; amg renaissance -> ; All MORRIS based machines have 16bit 'Japanese' format sound DAC's
+; amg renaissance ->         MOV     r0, #2_10
+; amg renaissance ->         STRB    r0, [r12, #IOMD_VIDMUX]
+; amg renaissance ->  ]
+; amg renaissance ->         B       CommonInit
+; amg renaissance ->
+; amg renaissance -> MedusaInit
+; amg renaissance ->  ]
 
 
   [ RO371Timings
@@ -1018,8 +1220,16 @@ MedusaInit
   ] ;RO371Timings conditional
 
         STRB    r0, [r12, #IOMD_ROMCR0]
+ [ STB
+  [ :LNOT: ExtROMis16bit
         STRB    r0, [r12, #IOMD_ROMCR1]         ; and do the same for extension ROMs (just in case)
-
+  |
+        MOV	r0, #IOMD_ROMCR_16bit + IOMD_ROMCR_Normal + IOMD_ROMCR_156 + IOMD_ROMCR_BurstOff
+	STRB    r0, [r12, #IOMD_ROMCR1]		; 16bit 156.25nS noburst (Lowest common denominator)
+  ]
+ |
+        STRB    r0, [r12, #IOMD_ROMCR1]         ; and do the same for extension ROMs (just in case)
+ ]
         MOV     r0, #IOMD_VREFCR_VRAM_256Kx64 :OR: IOMD_VREFCR_REF_16   ; select 16µs refresh, assume 2 banks of VRAM
         STRB    r0, [r12, #IOMD_VREFCR]
 
@@ -1201,12 +1411,14 @@ MemSize ROUT
 
  [ MorrisSupport
 ;
-        LDRB    r0, [r12, #IOMD_ID0]
-        CMP     r0, #&E7
-        LDRB    r0, [r12, #IOMD_ID1]
-        CMPEQ   r0, #&D4
-       ;MOVEQ   r3, #xxxx
-        BEQ     MemSizeIOMD                             ; IOMD (Medusa), else assume Morris
+        LDRB    r0, [r12, #IOMD_ID0]	; load r1 with IOMD ID high byte
+        LDRB    r1, [r12, #IOMD_ID1]	; load r0 with IOMD ID low byte
+        ORR     r0,r0,r1,LSL#8		; Or r0 and r1, shifted left 8, put in r0
+        LDR     r1,=IOMD_Original       ; get Ref IOMD ID code - original
+        CMP     r0,r1                   ; check for IOMD ID Code - original
+        BEQ     MemSizeIOMD             ; Not ID Code - original,
+                                        ;    therefore jump to Medusa hardware code
+                                        ;    else fall through to Morris code.
 ;
 ; MemSize for Morris
 ;
@@ -1214,9 +1426,15 @@ MemSize ROUT
         MOV     r11, #&70     ;all 4 banks assumed 32 bit - EDO and timing bits set in case 7500FE (don't care bits otherwise)
   |
         MOV     r11, #IOMD_DRAMWID_DRAM_32bit * &0F     ;set all 4 banks to be 32bit initially
+ 	LDR	r1, =IOMD_7500FE
+	TEQ	r0, r1					; are we on FE part?
+	ORREQ	r11, r11, #IOMD_DRAMWID_EDO_Enable :OR: IOMD_DRAMWID_RASCAS_3 :OR: IOMD_DRAMWID_RASPre_3
+							; if so, then enable EDO and slower RASCAS and RASPre times
+        ! 0,"7500FE support expects EDO memory in s.ARM600"
   ]
         MOV     r14, #IOMD_Base
         STRB    r11, [r14, #IOMD_DRAMWID]
+
  [ 1 = 0
         MOV     R10, #DRAM0PhysRam
         MOV     R11, #(2*OneMByte)
@@ -1378,7 +1596,7 @@ NoRamInBank
 
         TEQ     r10, #0                                 ; have we got any DRAM?
 ;NoDRAMPanic
-        BEQ     NoDRAMPanic                             ; oh my god we'd better stop now
+        BEQ     NoDRAMPanic                             ; we'd better stop now
 
 ;
 ; Having dumped our block/fragment data to the first bit of DRAM that we found.
@@ -1460,10 +1678,26 @@ AllocateTheRAM
         STR     r0, [r14, #IOMD_VIDCUR]                 ; set up VIDCUR to start of video RAM
         STR     r0, [r14, #IOMD_VIDSTART]               ; do same for VIDSTART
         STR     r0, [r14, #IOMD_VIDINIT]                ; and for VIDINIT
-                                                        ; so we don't get crap when we turn video DMA on later
+                                                        ; so we don't get a mess when we turn video DMA on later
+
+
+	LDRB	r4, [r14, #IOMD_ID0]
+	LDRB	r7, [r14, #IOMD_ID1]
+	ORR	r4, r4, r7, LSL #8
+	LDR	r7, =IOMD_7500FE			; if FE part, then assume EDO DRAM
+	TEQ	r4, r7
+	LDREQ	r4, =80000000				; so allow 80E6 bytes/s
+ [ STB
+	LDRNE	r4, =44000000				; else only allow 44E6 bytes/s
+ |
+        LDRNE   r4, =46500000                           ; if no VRAM, then 46.5E6 bytes/sec bandwidth
+ ]
+        STR     r4, [r2, #VideoBandwidth-PhysRamTable]  ; store video bandwidth
 
         LDR     r4, =46500000                           ; if no VRAM, then 46.5E6 bytes/sec bandwidth
         STR     r4, [r2, #VideoBandwidth-PhysRamTable]  ; store video bandwidth
+
+
 
         ADD     r4, r0, r1                              ;form VIDEND (will be on mult. of SAM)
         SUB     r4, r4, #4096
@@ -1593,7 +1827,7 @@ MemSizeIOMD_not810
 
         TEQ     r10, #0                                 ; have we got any DRAM?
 NoDRAMPanic
-        BEQ     NoDRAMPanic                             ; oh my god we'd better stop now
+        BEQ     NoDRAMPanic                             ; we'd better stop now
 
 ; Now go back and put the VRAM information in, and also program VIDCR and VIDCUR
 
@@ -1610,7 +1844,7 @@ NoDRAMPanic
         STR     r12, [r14, #IOMD_VIDCUR]                ; set up VIDCUR to start of video RAM
         STR     r12, [r14, #IOMD_VIDSTART]              ; do same for VIDSTART
         STR     r12, [r14, #IOMD_VIDINIT]               ; and for VIDINIT
-                                                        ; so we don't get crap when we turn video DMA on later
+                                                        ; so we don't get a mess when we turn video DMA on later
         STR     r3, [r7, #VideoBandwidth-DRAMPhysAddrA] ; store video bandwidth
 
         ADD     r3, r12, #1024*1024-4096                ; add on a bit to form VIDEND (will be on mult. of SAM)
@@ -1732,6 +1966,9 @@ MemSizeDone
 
         ADRL    r4, ROM                         ; use PC-relative addressing to get to start of image
         TEQ     r4, #PhysROM                    ; then see if it's the normal ROM address
+  [ STB
+	TEQNE	r4, #PhysExtROM			; or if it's the 2nd ROM bank
+  ]
         BEQ     %FT55                           ; if so, then we're OK
 
         SUB     r1, r1, #OSROM_ImageSize*1024   ; if we've been soft-loaded, then we have ?M less than we thought
@@ -2075,7 +2312,15 @@ MemInitTable    ;       sz, U, C, B, logaddr,   (ap,     (physaddr))
         MemInitSection   1, 1, 0, 0, &03500000, AP_None, &03400000      ; VIDC20 space
         MemInitSection   2, 1, 0, 0, &03600000, AP_None, &03600000      ; LAGs
 
-
+ [ STB
+  [ ExtROMSupport							; System build option
+	ASSERT (OSROM_ImageSize <= 4096)	; No room for extension ROMs with an 8MB OS image
+        MemInitROMs      4, 1, 1, 1, &03800000, AP_Read                 ; ROM
+        MemInitSection   4, 1, 1, 1, &03C00000, AP_Read, &01000000      ; Extension ROM
+  |
+        MemInitROMs      8, 1, 1, 1, &03800000, AP_Read			; ROM (1st or 2nd bank)
+  ]
+ |
         [ OSROM_ImageSize = 4096
         MemInitROMs      4, 1, 1, 1, &03800000, AP_Read                 ; ROM
         MemInitROMs      4, 1, 1, 1, &03C00000, AP_Read                 ; ROM
@@ -2085,6 +2330,7 @@ MemInitTable    ;       sz, U, C, B, logaddr,   (ap,     (physaddr))
         MemInitROMs      2, 1, 1, 1, &03C00000, AP_Read                 ; ROM
         MemInitROMs      2, 1, 1, 1, &03E00000, AP_Read                 ; ROM
         ]
+  ]
 
  [ :LNOT: NewStyle_Screen
         MemInitVideo    16, 1, 0, 1, &05000000, AP_None                 ; real screen (section-mapped)
@@ -2105,7 +2351,7 @@ MemInitTable    ;       sz, U, C, B, logaddr,   (ap,     (physaddr))
   [ StrongARM
 ;StrongARM requires 2*16k of private logical space (used for absolutely nothing else), which is
 ;readable and cacheable, for data cache cleaning purposes. We want to map the space to
-;start of ROM bank 1 (physical target), so that IOMD timings can be poked for maximum read speed 
+;start of ROM bank 1 (physical target), so that IOMD timings can be poked for maximum read speed
 ;(only requirement of physical space is that it is readable without h/w abort). Here, though,
 ;we have to conform to format for MemInitPagesL2, so we just point to some convenient RAM,
 ;and fix things up later (see L1L2PTenhancements)
@@ -2229,7 +2475,7 @@ TimeCPU ROUT         ;does not actually measure anything - assumes timings (and 
         MOV     r7, #&32                      ; 5-3 cycle ROM access
         STRB    r7, [r2, #IOMD_ROMCR0]
         STRB    r7, [r2, #IOMD_ROMCR1]
-        MOV     r7, #&07                      ; clock dividers: /1 for I/O, /1 for CPU, /1 for memory    
+        MOV     r7, #&07                      ; clock dividers: /1 for I/O, /1 for CPU, /1 for memory
         STRB    r7, [r2, #IOMD_CLKCTL]
         LDR     r7, =(1 :SHL: 16) :OR: 16000  ; assumed 16MHz RAM (32 MHz bus)
         MOV     pc, lr
@@ -2240,8 +2486,8 @@ timecpu7500FE
         STRB    r7, [r2, #IOMD_ROMCR0]
         STRB    r7, [r2, #IOMD_ROMCR1]
         MOV     r7, #&70                      ; EDO RAM, 32 bit wide, conservative RAS and CAS timing
-        STRB    r7, [r2, #IOMD_DRAMWID]       ; DRAM control reg. (more than just width on FE) 
-        MOV     r7, #&04                      ; clock dividers: /1 for CPU, /2 for memory, /2 for I/O  
+        STRB    r7, [r2, #IOMD_DRAMWID]       ; DRAM control reg. (more than just width on FE)
+        MOV     r7, #&04                      ; clock dividers: /1 for CPU, /2 for memory, /2 for I/O
         STRB    r7, [r2, #IOMD_CLKCTL]
         LDR     r7, =(1 :SHL: 16) :OR: 32000  ; assumed 32MHz RAM (64 MHz bus), even though /2 at the moment
         MOV     pc, lr
@@ -2268,7 +2514,7 @@ finalmemoryspeed ROUT
         CMP     r0, #&AA                ; EQ if 7500FE
         MOVEQ   r0, #&80
         STREQB  r0, [lr, #&CC]          ; ASTCR register: set i/o asynchronous timing for fast memory clock
-        MOVEQ   r0, #&06                ; clock dividers: /1 for CPU, /1 for memory, /2 for I/O  
+        MOVEQ   r0, #&06                ; clock dividers: /1 for CPU, /1 for memory, /2 for I/O
         STREQB  r0, [lr, #IOMD_CLKCTL]
 fmspeed_done
         Pull    "r0,pc",,^
@@ -2297,6 +2543,11 @@ TimeCPU ROUT            ;ONLY WORKS FOR IOMD(L) machines - this shouldn't be a p
         ORREQ   r7,r7,#&80
         ORREQ   r7,r7,#&10000           ;and note we're on IOMD
         MOVEQ   pc,lr
+  ]
+
+  [ STB
+        BIC     r9, r9, #3 :SHL: 8
+        STR     r9, [r9]                ; turn off refresh for a bit
   ]
 
 ; Time CPU/Memory speed
@@ -2429,6 +2680,8 @@ timecpu_sodthefancytimingstuff
 
   ] ;RO371Timings conditional
 
+        LTORG
+
 MemClkTable
         DCB     2_100101                ; 0 cycles (set to min which is 2)
         DCB     2_100101                ; 1 cycle (set to min. which is 2)
@@ -2540,10 +2793,10 @@ MMUControl_ModifyControl ROUT
         TST     r2,#&4                  ; if StrongARM, then I bit mirrors C bit
         ORRNE   r2,r2,#&1000
         BICEQ   r2,r2,#&1000
-05        
+05
    [ SAWBbroken :LOR: ARM810bpbroken
         MOV     lr,r2
-     [ SAWBbroken
+   [ SAWBbroken
         CMP     r5,#&A
         BICEQ   lr,lr,#&0008                   ;sorry guys, we can't use write buffer (safe-ish - safer would zap data cache bit as well)
      ]
@@ -2594,7 +2847,7 @@ MMUControl_ModifyControl ROUT
 15
    [ SAWBbroken :LOR: ARM810bpbroken
         MOV     lr,r2
-     [ SAWBbroken
+   [ SAWBbroken
         CMP     r5,#&A
         BICEQ   lr,lr,#&0008            ;sorry guys, we can't use write buffer
      ]
@@ -2660,7 +2913,7 @@ MMUC_flush_SA
        MOV     r2,#ARMA_Cleaner_flipflop
        LDR     r1,[r2]
        EOR     r1,r1,#16*1024
-       STR     r1,[r2]       
+       STR     r1,[r2]
        ARMA_clean_DC r1,r2,r3     ;effectively, fully clean/flush wrt non-interrupt stuff
        ARMA_drain_WB
        ARMA_flush_IC              ;do *not* flush DC - may be interrupt stuff in it
@@ -3580,7 +3833,7 @@ L1L2PTe_WPROMdone
         ADD     r0,r0,#1               ; = no. of 4k RAM pages in machine
         MOV     r0,r0,LSR #8           ; = no. of Mbytes in machine
         ADD     r0,r0,#3
-        BIC     r0,r0,#3               ; round up to next 4 Mb 
+        BIC     r0,r0,#3               ; round up to next 4 Mb
         CMP     r0,#28                 ; if 28Mb or more, no pages to be rescued from L2PT AppSpace
         BHS     %FT09
         LDR     r1,=AppSpaceDANode
@@ -3630,7 +3883,7 @@ L1L2PTe_WPROMdone
 
 09
         Pull    "r0-r5,pc"
-
+  [ StrongARM
 ;
 ; ---------------- XOS_SynchroniseCodeAreas implementation ---------------
 ;
@@ -3749,6 +4002,8 @@ dtgps_SAloop1
     ARMA_drain_WB           ; squeeze out those last drops
     MOV     pc,lr
 
+ ]
+
 ;ARM810 equiv of dtgps_SAcleanflush must clean/flush whole cache (cannot clean/flush by virtual address)
 ;and is shared with code in meminfo_flushplease, below
 
@@ -3756,7 +4011,7 @@ meminfo_flushplease         ; used by MemInfo
         ARM_read_ID r0
         AND     r0,r0,#&F000
         CMP     r0,#&A000
-        BEQ     mifp_SA      
+        BEQ     mifp_SA
   [ ARM810support
         CMP     r0,#&8000
         BEQ     mifp_810
@@ -3765,7 +4020,7 @@ meminfo_flushplease         ; used by MemInfo
         ARM67_flush_cache
         MOV     pc,lr
 mifp_SA
-;StrongARM - bugger, this could take a while...
+;StrongARM - this could take a while...
         MOV     r1,#ARMA_Cleaner_flipflop
         LDR     r0,[r1]
         EOR     r0,r0,#16*1024

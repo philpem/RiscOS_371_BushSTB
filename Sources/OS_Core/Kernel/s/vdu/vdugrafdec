@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > &.Source.VduGrafDec
 ;
 ; ARTHUR OPERATING SYSTEM - Vdu Drivers
@@ -53,8 +67,8 @@ PostCycleCount # 4
   ^ GraphicWs
 
 TLine1  # 4*9   ;Line parameters used by Tri & Par fill
-TLine2  # 4*9   
-TEndY   # 4       
+TLine2  # 4*9
+TEndY   # 4
 Vertex1X # 4    ;                                        --
 Vertex1Y # 4    ;                                          |
 Vertex2X # 4    ;                                          |
@@ -122,13 +136,13 @@ EllBlk     # 4*8        ;Parameter block for ellipses
 EllBlkSliceCnt * EllBlk
 EllBlkEllY     * EllBlk + 4*4
 
-                        
+
 EllPrevL   # 4          ;Slice limits for previous line        --
 EllPrevR   # 4          ;                                        |
 EllThisL   # 4          ;                 current line           |
 EllThisR   # 4          ;                                        |
 EllNextL   # 4          ;                 next line              |
-EllNextR   # 4          ;                                      -- 
+EllNextR   # 4          ;                                      --
 
 EllHLineWs # 4*5        ;This could be pushed to the stack
 EllDoubleHLineWs # 4*5  ;This could be pushed to the stack
@@ -182,7 +196,7 @@ QueuePtrs       # 4*4   ; head, tail, end, start
 FldSaveArea     # 5*4   ; saved Y, target colour, NPix, zgora, zgeor
 FldSaveY * FldSaveArea +0
 
-FldStackLevel   # 4            
+FldStackLevel   # 4
                 [ med_00001_userma
 flood_cda_rma   # 4     ; amount we've changed the rma size by
                 ]
@@ -233,14 +247,14 @@ SPltLMask   # 4
 SPltRMask   # 4
 ; SPltzgooPtr # 4
 SPltEcfPtr  # 4
-SPltEcfIndx # 4  
+SPltEcfIndx # 4
 SPltPixPerWord # 4
 SPltBPP     # 4
 SPltMaskBit # 4
 SPltMaskPtr # 4
 SPltMaskRowBit # 4
 SPltMaskRowPtr # 4
-SPltMaskRowLen # 4 
+SPltMaskRowLen # 4
 
 SPltzgooMasks # 16      ; zgoo, zgeo, zgoe, zgee
 

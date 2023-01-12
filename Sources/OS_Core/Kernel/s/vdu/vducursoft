@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.VduCurSoft
 
 SlowCursorSpeed * 16
@@ -412,7 +426,7 @@ Vdu23_0_11
 Vdu23_1
         LDR     R0, [WsPtr, #CursorFlags]
         TST     R0, #Vdu5Bit
-        MOVNE   PC, R14                 ; none of this crap in VDU5 mode
+        MOVNE   PC, R14                 ; none of this nonsense in VDU5 mode
 
         LDRB    R1, [WsPtr, #QQ+1]      ; get parameter
 
@@ -495,7 +509,7 @@ VDUBE
         TEQ     R1, #0
 
         ANDEQS  R1, R6, #Vdu5Bit                ; zero if not in VDU 5 mode
-        
+
 ; insert check for vdu disabled here
 
         CMP     R1, #0                          ; set Z on R1, C:=1
@@ -544,7 +558,7 @@ AlreadySplit
         BEQ     InputCursorRight        ; &89
         CMP     R0, #&8B
         BCC     InputCursorDown         ; &8A
-        
+
 ; and drop thru to ...
 
 InputCursorUp

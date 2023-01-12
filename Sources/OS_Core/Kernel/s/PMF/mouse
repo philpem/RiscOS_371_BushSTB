@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.PMF.Mouse
 
 ; Mouse driving code
@@ -35,6 +49,9 @@ MouseInit
 
         MOV     r0, #0
         STRB    r0, MouseButtons
+        [ STB
+        STRB    r0, MousePresent
+        ]
 
         MOV     r0, #MouseCMOS
         BL      Read
@@ -77,7 +94,7 @@ MouseButtonChange ROUT
         BL      OSEVEN
         MOV     WsPtr, #IOC
 
- [ :LNOT:MouseBufferManager        
+ [ :LNOT:MouseBufferManager
         [ MouseBufferFix
         LDR     R0, MouseX
         |
@@ -148,7 +165,7 @@ MouseButtonChange ROUT
 10
         Pull    "R0-R5, R12, PC"
 
- [ :LNOT:MouseBufferManager        
+ [ :LNOT:MouseBufferManager
 MouseInsert
         Push    "R10,R12,R14"
         MOV     R10, #INSV
@@ -165,7 +182,7 @@ ReadMouse ROUT
         Push    "R4-R6,R10-R12"
         MOV     R11, #KeyWorkSpace
 
- [ :LNOT:MouseBufferManager        
+ [ :LNOT:MouseBufferManager
         MOV     R1, #Buff_Mouse
         BL      KeyREMOVE
         BCS     %FT10                   ; MouseAhead buffer empty
@@ -343,8 +360,15 @@ PollPointer
         Pull    "lr"                    ; Restore SVC lr.
         TEQP    r9, #0
         NOP
-
-        BL      ProcessMouseXY
+        [ STB
+        TEQ     r2, #0
+        TEQEQ   r3, #0
+        MOVNE   lr, #1
+        STRNEB  lr, MousePresent
+        BLNE    ProcessMouseXY
+        |
+        BL	ProcessMouseXY
+        ]
 
         Pull    "r12,pc"
 
@@ -358,6 +382,12 @@ PointerSWI
         TEQ     r0, #0
         LDREQB  r0, MouseType
         BEQ     SLVK
+
+	[ STB
+        TEQ     r0, #2
+        LDREQB  r0, MousePresent
+        BEQ     SLVK
+        ]
 
         TEQ     r0, #1
         BNE     %FT10

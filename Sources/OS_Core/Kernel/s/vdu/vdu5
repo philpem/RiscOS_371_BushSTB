@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.Vdu5
 
 ; *****************************************************************************
@@ -207,7 +221,7 @@ Vdu5DoOneWord
         ANDNE   R14, eormask, cword0
         EORNE   chartmp, chartmp, R14
         STRNE   chartmp, [scr]
-  
+
 Vdu5LinePainted
         Pull    "ecfptr,scrend,charmsk,llength,charptr"
 
@@ -247,18 +261,18 @@ Vdu5Mode10
         EORNE   chartmp, chartmp, R14
         STRNE   chartmp, [scr, #12]
         MOVS    cword2, cword0, LSL charshf
-        
+
         AND     R14, charbyte, #&F0
         ADD     R14, charptr, R14, LSR #1
         LDMIA   R14, {cword0, cword1}
         ORRS    cword2, cword2, cword1, LSR invcharshf
         B       Vdu5DoTwoWords
-          
+
 ; Expand the character data out to 32 bit per pixel (mode 48 or similar)
 
       [ VIDC_Type = "VIDC20"
 
-        MACRO   
+        MACRO
 $l      PixMunge32 $reg, $mask, $offset
 $l
         TST     $reg, #$mask
@@ -267,13 +281,13 @@ $l
         EORNE   chartmp, chartmp, eormask
         STRNE   chartmp, [scr, #$offset]
         MEND
-        
-; Perform bit expansion on the fly, this is a word based operation, no need to 
-; extract sub-pixels from the ORR / EOR masks, simply perform the bit test and 
+
+; Perform bit expansion on the fly, this is a word based operation, no need to
+; extract sub-pixels from the ORR / EOR masks, simply perform the bit test and
 ; then write the character data to the screen!
 
 Vdu5Mode32
-                                   
+
         PixMunge32 charbyte, 1<<7, 0
         PixMunge32 charbyte, 1<<6, 4
         PixMunge32 charbyte, 1<<5, 8
@@ -282,9 +296,9 @@ Vdu5Mode32
         PixMunge32 charbyte, 1<<2, 20
         PixMunge32 charbyte, 1<<1, 24
         PixMunge32 charbyte, 1<<0, 28
-                              
+
         B       Vdu5LinePainted                 ; flow down and try the next line
-                            
+
       ]
 
 ; *****************************************************************************
@@ -366,7 +380,7 @@ ENQ
         LDR     R0, [WsPtr, #NPix]              ; Graphics mode ?
         TEQ     R0, #0
         MOVEQ   PC, R14                         ; no, then return
-      ]       
+      ]
 
         MOV     R1, #0
         BSR     CursorOnOff                     ; turn cursor off without
@@ -593,7 +607,7 @@ GCursorRBdy
         LDR     R7, [WsPtr, #GWRCol]
         LDR     R2, [WsPtr, #GCharSizeX]
         SUB     R7, R2, R7                      ; R7 = SizeX-GWRCol
-        LDR     R2, [WsPtr, #GCharSpaceX]        
+        LDR     R2, [WsPtr, #GCharSpaceX]
         MLA     R0, R2, R0, R7                  ; R0 = SizeX-GWRCol+X*SpaceX
         RSB     R0, R0, #1                      ; GWRCol-X*SpaceX-(SizeX-1)
         STR     R0, [WsPtr, #GCsIX]

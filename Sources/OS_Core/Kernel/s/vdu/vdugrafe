@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.VduGrafE
 ;
 ; ARTHUR OPERATING SYSTEM - Vdu Drivers
@@ -365,7 +379,7 @@ FloodFill ROUT
         STMIA   R14, {R2-R4}            ; store colour, flag, YWindLimit
 
         [ med_00001_userma
-        
+
         ; the idea here is to try to use between 48k and 128k of rma instead of 16k of
         ; scratchspace. if there's less than 48k of rma in the first place we go back to
         ; scratchspace. if there's 128k or more we claim the 128k and proceed. For values
@@ -374,9 +388,9 @@ FloodFill ROUT
         ; free space hasn't grown to 128k we then claim the additional balance needed to
         ; have 128k available. Should either grow fail, we just use whatever (over 48k)
         ; was available
-        
+
         ;R3-R7 spare at presenet
-        Push    "R0-R2"                  
+        Push    "R0-R2"
         MOV     R0, #0
         STR     R0, [WsPtr, #flood_cda_rma]                     ; set amount to change dyn. area by
         MOV     R0, #ModHandReason_RMADesc
@@ -388,13 +402,13 @@ use_scratchspace
         MOV     R4, R3                                          ; tail ptr
         ADD     R5, R3, #FldQueueSize                           ; end ptr (== scratchspace size)
         MOV     R6, R3                                          ; start ptr
-        B       %FT92  
+        B       %FT92
 91
         CMP     R2, #smallest_rma_size                          ; compare against small threshold
         BLT     use_scratchspace                                ; not enough free - use scratchspace
         CMP     R2, #largest_rma_size                           ; compare against high threshold
         BHS     %FT96                                           ; lots free - use largest ceiling value
-        
+
         RSB     R1, R2, #largest_rma_size                       ; work out how much more to claim
         MOV     R0, #1                                          ; rma
         SWI     XOS_ChangeDynamicArea
@@ -406,13 +420,13 @@ use_scratchspace
         BVS     use_scratchspace
         CMP     R2, #largest_rma_size
         BHS     %FT96                                           ; it has, so claim the maximum
-        
+
         LDR     R1, [WsPtr, #flood_cda_rma]                     ; the free space didn't grow to maximum, so the
         RSB     R1, R1, #largest_rma_size                       ; largest space wasn't at the end. Do a second
         MOV     R0, #1                                          ; grow of the rma to make the maximum
-        SWI     XOS_ChangeDynamicArea   
+        SWI     XOS_ChangeDynamicArea
         LDRVC   R0, [WsPtr, #flood_cda_rma]                     ; if it succeeded, update the amount that we
-        ADDVC   R0, R0, R1                                      ; need to shrink the rma by 
+        ADDVC   R0, R0, R1                                      ; need to shrink the rma by
         STRVC   R0, [WsPtr, #flood_cda_rma]
                                                                 ; and fall into the claim largest space routine
 94
@@ -421,18 +435,18 @@ use_scratchspace
         BVS     use_scratchspace                                ; find the largest lump now available
         CMP     R2, #largest_rma_size
 96
-        MOVGT   R3, #largest_rma_size 
+        MOVGT   R3, #largest_rma_size
         MOVLE   R3, R2                                          ; cap it at the maximum size we want
         MOV     R0, #ModHandReason_Claim                        ; try to claim it
         SWI     XOS_Module
         BVS     use_scratchspace
-        
+
         ADD     R5, R2, R3                                      ; do it in a slightly different order so
         MOV     R3, R2                                          ; we can use the R2 and R3 back from the claim
         MOV     R4, R3                                          ; (R2=where, R3=size)
         MOV     R6, R3
 
-92        
+92
         ADD     R7, WsPtr, #QueuePtrs
         STMIA   R7, {R3, R4, R5, R6}    ; initialise queue
         Pull    "R0-R2"
@@ -486,12 +500,12 @@ use_scratchspace
 30
         ADD     R11, WsPtr, #QueuePtrs  ; unqueue one item
         LDMIA   R11, {R3,R4,R5}         ; head,tail,limit
-        TEQ     R3, R4                  ; if queue empty 
+        TEQ     R3, R4                  ; if queue empty
         [ med_00001_userma
         BLEQ    release_memory
         ]
         Pull    PC, EQ                  ; then exit
-        
+
         [ med_00001_twowords
         LDR     R1, [R3], #4
         MOV     R0, R1, LSR #16         ; LeftX
@@ -768,7 +782,7 @@ CheckAlong ROUT
 ;       exits by pulling stacked R14 if queue was full
 ;
 
-Queue   ROUT         
+Queue   ROUT
         Push    "R0,R11,R14"
         TEQ     R5, R5, LSR #1          ; CS => mangle coords
 
@@ -782,7 +796,7 @@ Queue   ROUT
         [ med_00001_twowords
         ; revised packing, expanded to two words, LeftX in 31..16 of word 1,
         ; RightX in 15..0 of word 1, and Y in 15..0 of word 2
-        
+
         MOV     R9, R9, LSL #16         ; shift LeftX up
         ORR     R9, R9, R10             ; combine in RightX
 
@@ -807,9 +821,9 @@ Queue   ROUT
         LDREQ   R11, [R0, #12]          ; then reload with start ptr
         CMP     R11, R10                ; EQ and CS if queue full
         STRNE   R11, [R0, #4]           ; store tail ptr back if OK
-         
+
         Pull    "R0,R11,PC", NE         ; queue not full, terminate normally
-        
+
         [ med_00001_userma
         BL      release_memory
         ]
@@ -817,15 +831,15 @@ Queue   ROUT
         Pull    PC                      ; else bomb out
 
 ; *****************************************************************************
-                         
+
         [ med_00001_userma
-release_memory  
+release_memory
         ROUT
-        Push   "R0-R5,lr"   
-        
+        Push   "R0-R5,lr"
+
         ADD    R0, WsPtr, #QueuePtrs
         LDMIA  R0, {R0-R3}
-        
+
         [ med_00001_debug
         LDR    R0, =med_00001_debug_start
         STR    R3, [R0], #4
@@ -833,26 +847,26 @@ release_memory
         LDR    R5, [WsPtr, #flood_cda_rma]
         STR    R5, [R0]
         ]
-        
+
         LDR    R5, =FldQueueStart
-        
+
         CMP    R3, R5                   ; did we use scratchspace ?
-        BEQ    %FT20                 
-                 
+        BEQ    %FT20
+
         MOV    R2, R3
         MOV    R0, #ModHandReason_Free
         SWI    XOS_Module
-20                         
+20
         LDR    R0, [WsPtr, #flood_cda_rma]
         CMP    R0, #0
         BEQ    %FT30                    ; no need to shrink rma
-        
+
         RSB    R1, R0, #0               ; get the signed negative value
         MOV    R0, #1                   ; rma
         SWI    XOS_ChangeDynamicArea
-30      
+30
         CMP    r0, r0                   ; ensure we return EQ set
-        Pull   "r0-r5,pc" 
+        Pull   "r0-r5,pc"
         ]
 
 ; *****************************************************************************

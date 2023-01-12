@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.VduTTX
 
 ;       Teletext (MODE 7) emulation
@@ -63,7 +77,7 @@ TTXGraphSepaFontB * TTXSoftFonts +&3C0 ; Separated graphics font  (&60-&7F)
 ;       Bit  20         0 => Unboxed, 1 => Boxed
 ;       Bits 21-23      Background colour
 ;       Bit  24         0 => Unboxed, 1 => Boxed
-;       Bits 25-29,31   Held graphic 
+;       Bits 25-29,31   Held graphic
 ;       Bit  30         0 => Held graphic contiguous, 1 => separated
 
 MapBit_Char     *       1 :SHL: 0
@@ -473,7 +487,7 @@ TTXHardScrollUp ROUT
 
         LDR     R0, [WsPtr, #RowLength]         ; save real RowLength
         Push    "R0, R6, R14"                   ; and save CursorFlags
-        
+
         MOV     R0, #1                          ; pretend rowmult = 1
         LDR     R2, TTXLineStarts               ; R2 -> TTXMap
         MOV     R5, #41*4                       ; R5 = no. of bytes horiz
@@ -502,7 +516,7 @@ TTXHardScrollUp ROUT
         LDR     R1, [R8]                        ; R1 = dummy word
         TST     R1, #MapBit_Bottom              ; if not bottom
         BEQ     %FT20                           ; then OK
-        
+
         BIC     R1, R1, #MapBit_Bottom          ; make into a 'top' line
         STR     R1, [R8]                        ; store back
         LDRB    R0, [R8, #4]                    ; R0 = first char
@@ -552,7 +566,7 @@ TTXSoftScrollUp ROUT
         LDR     R5, [WsPtr, #TWRCol]
 
         Push    "R0-R6,R14"                     ; and save CursorFlags
-        
+
         ADD     R2, R2, R4, LSL #2              ; R2 -> top left char
 
         SUB     R5, R5, R4
@@ -650,7 +664,7 @@ TTXHardScrollDown ROUT
 
         LDR     R0, [WsPtr, #RowLength]         ; save real RowLength
         Push    "R0, R6, R14"                   ; and save CursorFlags
-        
+
         MOV     R0, #1                          ; pretend rowmult = 1
         LDR     R2, TTXLineStarts+24*4          ; R2 -> dummy char on bottom
         MOV     R5, #41*4                       ; R5 = no. of bytes horiz
@@ -701,7 +715,7 @@ TTXSoftScrollDown ROUT
         LDR     R5, [WsPtr, #TWRCol]
 
         Push    "R0-R6,R14"                     ; and save CursorFlags
-        
+
         ADD     R2, R2, R4, LSL #2              ; R2 -> bottom left char
 
         SUB     R5, R5, R4

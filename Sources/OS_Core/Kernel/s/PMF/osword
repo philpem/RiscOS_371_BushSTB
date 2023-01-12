@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.PMF.osword
 
 maxword * &16                                   ; highest known osword
@@ -460,7 +474,7 @@ OsWord0EBeta ROUT
 
         LDR     R0,[R2,#24]             ; Get year
         LDR     R1,=1900
-        SUB     R0,R0,R1                
+        SUB     R0,R0,R1
 01
         CMP     R0,#100
         SUBGT   R0,R0,#100
@@ -504,7 +518,7 @@ OsWord0EBeta ROUT
 ; so convert each item into BCD
 
         MOV     R1, #6                  ; seven bytes to convert
-     
+
 10
         LDRB    R0, [R4, R1]
         BL      HexToBCD
@@ -543,7 +557,7 @@ OsWord0EBeta ROUT
 ; in:   R4 -> BCD time
 ;
 
-OsWord0EGamma ROUT   
+OsWord0EGamma ROUT
 
         [ {TRUE}                        ; International version.
 ;build a block for Territory_ConvertOrdinalsToTime
@@ -580,8 +594,8 @@ OsWord0EGamma ROUT
         BL      BCDToHex
         STR     R0,[R2,#20]
 
-        
-        LDRB    R0,[R4,#1]              ; Year 
+
+        LDRB    R0,[R4,#1]              ; Year
         BL      BCDToHex
         LDR     R1,=1900
         ADD     R0,R0,R1
@@ -592,7 +606,7 @@ OsWord0EGamma ROUT
         SWI     XTerritory_ConvertOrdinalsToTime
         ADDVS   SP,SP,#28
         BVS     OSWord0Eerror
-                        
+
         ADD     SP,SP,#20
         MOV     R1,R4
         B       OSWord0EReturnString    ; Now we have 5 byte value on stack,
@@ -798,7 +812,7 @@ OsWord0F ROUT
 
         ADR     r0, RealTime
         LDMIA   r0, {r0,r1}             ; LDM is atomic wrt interrupts
-          
+
         Push    "r0,r1"                 ; put value on stack
         MOV     r0,#-1                  ; use configured territory.
         ADD     r2, sp, #8
@@ -814,7 +828,7 @@ OsWord0F ROUT
 05
 ; Now [SP] -> ordinals in local time, but we want time in UTC
 ; First convert the ordinals to 5 byte UTC time
-                 
+
         MOV     r0, #-1                 ; use configured territory.
         MOV     r2, sp                  ; r2 -> ordinals block
         SUB     sp, sp, #8              ; two more words to contain 5 byte time
@@ -831,8 +845,8 @@ OsWord0F ROUT
         SWI     XTerritory_ConvertTimeToUTCOrdinals
         ADDVS   sp, sp, #44             ; 36 bytes ordinals + 8 for 5 byte time.
         ADDVS   sp, sp, r10             ; and junk string as well
-        BVS     Bad0F     
-                               
+        BVS     Bad0F
+
         ADD     sp, sp, #8              ; discard 5 byte time
 
 10
@@ -904,7 +918,7 @@ OsWord0F ROUT
 
         ADR     R0, MonthLengths        ; now validate days against
         LDRB    R1, [R0, R3]            ; maximum number of days in that month
-        CMP     R1, R2                  ; (29 for Feb) and eliminate if crap
+        CMP     R1, R2                  ; (29 for Feb) and eliminate if invalid
         BCC     Bad0F
 
 ; R2 now contains the days

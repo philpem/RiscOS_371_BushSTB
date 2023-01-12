@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
         TTL     => SysComms , the system commands file: Load save dump etc.
 
 TAB      *      9
@@ -57,7 +71,7 @@ HelpText
         Command Print,   1,  1, International_Help
         Command Quit,    0,  0, International_Help
         Command Remove,  1,  1, International_Help
-        Command Save,    6,  2, International_Help ; *SAVE Fn St + Le Ex Lo (Bloody compatibility)
+        Command Save,    6,  2, International_Help ; *SAVE Fn St + Le Ex Lo (compatibility)
         Command Shadow,  1,  0, International_Help
         Command Spool,   1,  0, International_Help
         Command SpoolOn, 1,  0, International_Help
@@ -864,7 +878,7 @@ Dump_Code ENTRY "$UtilRegs"
         BVS     UtilityExitCloseR1
 
         CMP     r4, #0                  ; Zero length ?
-        BEQ     UtilityExitCloseR1      ; Bugger all to do then ! VClear
+        BEQ     UtilityExitCloseR1      ; Nothing to do then ! VClear
 
         MOV     r5, r9                  ; Standard place for handle below
 
@@ -1163,7 +1177,7 @@ Load_Code ENTRY "$UtilRegs"
 
         BL      SkipNameAndReadAddr
         EXIT    VS
-        BLCS    SetErrorBadAddress      ; Must check for trailing crap
+        BLCS    SetErrorBadAddress      ; Must check for trailing junk
         MOVVC   r3, #0                  ; Got load address from command line
 
 90      MOVVC   r0, #OSFile_Load
@@ -1282,7 +1296,7 @@ Opt_Code ENTRY
         BL      FS_SkipSpaces           ; Try getting another parm anyway
         BCC     %FT50                   ; End of the line
 
-        TEQ     r0, #","                ; Bloody commas too !
+        TEQ     r0, #","                ; commas too !
         ADDEQ   r1, r1, #1
         BLEQ    FS_SkipSpaces
         CMP     r0, #space              ; Anything here ?
@@ -1532,7 +1546,7 @@ PrintCharInGSFormat ENTRY "r1, listopt"
         CMP     r0, #"|"        ; Solidus ? VClear
         CMPNE   r0, #""""       ; Quote ?
         CMPNE   r0, #"<"        ; Left angle ?
-        SWINE   XOS_WriteC      ; Nope, so let's print the char and bugger off
+        SWINE   XOS_WriteC      ; Nope, so let's print the char and exit
         EXIT    VS
         EXIT    NE
 

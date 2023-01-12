@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
         TTL     => MoreSWIs
 
 ;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -223,7 +237,7 @@ XOS_PrettyPrint_code ROUT
           SUBGT   R2, R2, #1
           SWIGT   XOS_WriteI+" "    ; output separator if not 1st on line
           BVS     exitpp
-          
+
 04        BL      getbytepp
           CMP     R0, #31           ; hard space?
           MOVEQ   R0, #" "
@@ -261,7 +275,7 @@ exitpp    MOV     stack, r9
           CMP     R0, #13
           BEQ     %BT21              ; TAB, CR - whalley!
           CMP     R0, #TAB
-          SUBNE   R5, R5, #1         ; leading spaces, crap ignored
+          SUBNE   R5, R5, #1         ; leading spaces, junk ignored
           ADDEQ   R5, R5, #8         ; multiple tabs OK tho.
           CMP     r0, #0             ; terminator?
           BNE     %BT24              ; only case to allow zero-length word
@@ -400,7 +414,7 @@ RdArgs_SWICode ROUT
       MOV     R12, R0
 01    MOV     R11, #UnsetFlag
       SUBS    R3, R3, #4
-      BMI     %FT99               ; silly bugger given whassock amount of space
+      BMI     %FT99               ; insufficient space
       STR     R11, [R10], #4
 02    LDRB    R11, [R12], #1
       CMP     R11, #"/"
@@ -461,7 +475,7 @@ RdArgs_SWICode ROUT
       BVS     %FT90
       B       %BT10
 
-12    CMP     R12, #EndType 
+12    CMP     R12, #EndType
       BNE     %BT10
 
 ; postscan to check all /a args set.
@@ -519,7 +533,7 @@ RdItem    ROUT
       BICLTS PC, lr, #V_bit
 
       CMP    R12, #""""
-      BEQ    ogoditsquotedargumentsagain
+      BEQ    ohnoitsquotedargumentsagain
 
       CMP    R12, #"-"      ; options?
       BNE    %FT02          ; nope - boring item
@@ -607,7 +621,7 @@ RdItem    ROUT
       Pull  "R1, R7, R8, lr"
       BICS   PC, lr, #V_bit
 
-ogoditsquotedargumentsagain
+ohnoitsquotedargumentsagain
       MOV    R7, #""""
       B      %BT06
 
@@ -961,7 +975,7 @@ Confirm_Code ROUT
         BVS     confirm_waitloop        ; And jump to poll keyboard
 
 ; Set pointer shape from the sprite area found (r1)
-                
+
 10      MOV     r7, #0                  ; No pixel translation
         ADR     r6, confirm_scale       ; pointer scaling factor (1:1)
         MOV     r5, #0                  ; y hot spot offset

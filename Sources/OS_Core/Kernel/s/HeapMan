@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
         TTL     => HeapMan : Heap Allocation SWI
 
 ; Interruptible heap SWI.
@@ -13,10 +27,10 @@
 ; with an IRQ process doing heap ops with interrupts enabled will cause
 ; trouble.
 
-                    GBLS HeapCrapAsModuleBRA
-                    GBLS HeapCrapAsModuleKET
-HeapCrapAsModuleBRA SETS "[ {FALSE}" ; "" for modular testing version
-HeapCrapAsModuleKET SETS "]"          ; "" for modular testing version
+                    GBLS HeapBadAsModuleBRA
+                    GBLS HeapBadAsModuleKET
+HeapBadAsModuleBRA SETS "[ {FALSE}" ; "" for modular testing version
+HeapBadAsModuleKET SETS "]"          ; "" for modular testing version
 
               GBLS RecursiveHeap
 RecursiveHeap SETS "XOS_Heap"
@@ -33,7 +47,7 @@ $l   LDR $r, =$var
               GBLL TubeInfo
 TubeInfo      SETL {FALSE}
 
-   $HeapCrapAsModuleBRA
+   $HeapBadAsModuleBRA
 
      GET Hdr:Listopts
      GET Hdr:Macros
@@ -84,7 +98,7 @@ RecursiveHeap SETS "1024 + (1:SHL:17)"
 
 Title = "HeapTestModule",0
 
-   $HeapCrapAsModuleKET
+   $HeapBadAsModuleKET
 
         GBLL    debheap
 debheap SETL    1=0
@@ -104,7 +118,7 @@ size    RN      r3
 HpTemp  RN      r10     ; But not these
 tp      RN      r11
 bp      RN      r12
-arse    RN      r4      ; This is the only one we have to save.
+work    RN      r4      ; This is the only one we have to save.
 
 ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ; +                     H E A P   O R G A N I S A T I O N                     +
@@ -193,7 +207,7 @@ $label  TST$cond $reg, #ARM_CC_Mask
        ]
         MEND
 
-   $HeapCrapAsModuleBRA
+   $HeapBadAsModuleBRA
 
    [ TubeInfo
 DebugTUBE  * &03340000+1*&4000         ; tube in podule #1
@@ -205,7 +219,7 @@ R1DATA # 4
 
 ; routine to stuff a char down the Tube
      MACRO
-$l   TubeChar $reg1, $reg2, $charset, $stackthere
+$l   TubeChar $reg1, $reg2, $chworkt, $stackthere
   !  0, "TubeChar used."
 $l
    [ "$stackthere"=""
@@ -215,14 +229,14 @@ $l
 01   LDRB $reg2, [$reg1, #R1STAT]
      TST $reg2, #&40
      BEQ %BT01
-     $charset
+     $chworkt
      STRB $reg2, [$reg1, #R1DATA]
    [ "$stackthere"=""
    Pull "$reg1, $reg2"
    ]
    MEND
 
-   $HeapCrapAsModuleKET
+   $HeapBadAsModuleKET
 
 ;****************************************************************************
 
@@ -231,8 +245,8 @@ $l
 
  [ Fix4
 CopyBackwardsInSafeZone
-        LDR     arse, [stack, #3*4]     ; get user link
-        ANDS    arse, arse, #I_bit      ; look at I_bit
+        LDR     work, [stack, #3*4]     ; get user link
+        ANDS    work, work, #I_bit      ; look at I_bit
         TEQEQP  PC, #SVC_mode           ; if was clear then clear it now
 
         ADD     bp, bp, #4              ; new block pointer
@@ -241,16 +255,16 @@ CopyBackwardsInSafeZone
 ; copy wackbords: HpTemp-4 bytes from addr+4 to bp, in appropriate order!
 cpe_prev
         SUBS    HpTemp, HpTemp, #4
-        LDRGT   arse, [addr, #4]!
-        STRGT   arse, [bp], #4
+        LDRGT   work, [addr, #4]!
+        STRGT   work, [bp], #4
         BGT     cpe_prev
 
         TEQP    PC, #SVC_mode + I_bit   ; disable IRQs before we venture back
         B       GoodExtension           ; into danger zone
 
 ReallocateInSafeZone
-        LDR     arse, [addr, hpd]!      ; get block size, set block addr
-        ADD     size, size, arse
+        LDR     work, [addr, hpd]!      ; get block size, set block addr
+        ADD     size, size, work
         SUB     size, size, #4          ; block size to claim
         ADD     addr, addr, #4
         MOV     bp, addr                ; address to copy from
@@ -265,15 +279,15 @@ ReallocateInSafeZone
  LDR HpTemp, hpddebug
  CMP HpTemp, #0
  BEQ %FT06
- DREG arse, "got new block : copying "
+ DREG work, "got new block : copying "
 06
  ]
 
         STR     addr, [stack, #4]
 
-; claimed : copy arse-4 bytes from bp to addr
+; claimed : copy work-4 bytes from bp to addr
 CopyForExtension
-        SUBS    arse, arse, #4
+        SUBS    work, work, #4
         LDRGT   HpTemp, [bp],#4
         STRGT   HpTemp, [addr],#4
         BGT     CopyForExtension
@@ -312,9 +326,9 @@ SafeNaffExtension
 ;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 heapopdoneinbackground ROUT
-     $HeapCrapAsModuleBRA
+     $HeapBadAsModuleBRA
      SetBorder R10, R11, 0, 0, 10      ; blue for returning
-     $HeapCrapAsModuleKET
+     $HeapBadAsModuleKET
         jeep       R12, HeapReturnedReg_R0
 
    [ TubeInfo
@@ -380,7 +394,7 @@ inspect_IRQ_stack
     ; somebody's in the heap code! Time for perversion.
     ; Pick up registers, do foreground op, poke IRQstack return address
 
-     $HeapCrapAsModuleBRA
+     $HeapBadAsModuleBRA
      Push "R0, R1, lr"
      MOV   R0, R10
      [ TubeInfo
@@ -388,7 +402,7 @@ inspect_IRQ_stack
      ]
      SetBorder R0, R1, 15, 8, 6
      Pull "R0, R1, lr"
-     $HeapCrapAsModuleKET
+     $HeapBadAsModuleKET
 
          ADRL   R10, heapopdoneinbackground
          ORR    R10, R10, #SVC_mode+I_bit
@@ -477,16 +491,16 @@ GoodHeapExit                            ; V cleared on entry to SWI dispatch
         Pull    lr
         ORRVS   lr, lr, #V_bit          ; VSet Exit
 
-     $HeapCrapAsModuleBRA
+     $HeapBadAsModuleBRA
         MOVS   PC, lr
-     $HeapCrapAsModuleKET
+     $HeapBadAsModuleKET
 
         ExitSWIHandler                  ; Like all good SWI handlers
 
 ;HeapInUse
-;     $HeapCrapAsModuleBRA
+;     $HeapBadAsModuleBRA
 ;       SetBorder R10, R11, 15, 0, 0
-;     $HeapCrapAsModuleKET
+;     $HeapBadAsModuleKET
 
 ;        ADR     R0, ErrorBlock_HeapFail_HeapLocked
 ;        B       NaffHeapExit
@@ -502,7 +516,7 @@ GoodHeapExit                            ; V cleared on entry to SWI dispatch
        MakeErrorBlock  HeapFail_ExcessiveShrink
 ;       MakeErrorBlock  HeapFail_HeapLocked
 
-     $HeapCrapAsModuleBRA
+     $HeapBadAsModuleBRA
 
 ; inline workspace for testing
 
@@ -520,7 +534,7 @@ HeapReturnedReg_R4  & 0
 HeapReturnedReg_R13 & 0
 HeapReturnedReg_PC  & 0               ; also acts as interlock
 
-     $HeapCrapAsModuleKET
+     $HeapBadAsModuleKET
 
 ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ; Subroutine to validate heap pointer
@@ -577,7 +591,7 @@ vhpds_fail
 
 InitHeap ROUT
  [ MEMM_Type <> "ARM600"        ; If on ARM600 these checks are not valid
-        CheckPtr hpd                       ; Is either hpd or size crap ?
+        CheckPtr hpd                       ; Is either hpd or size bad ?
         CheckPtr size, EQ,  (16*1024*1024) ; If hpd ok, check size < 16M
         BNE     NaffHeapInitialise
  ]
@@ -740,7 +754,7 @@ GetArea ROUT
  ]
 
         CMP     size, #0                        ; Can't deallocate 0, so there!
-        BLE     garfailed_zero                  ; And -ve is stupid as well!
+        BLE     garfailed_zero                  ; And -ve is invalid as well!
      ; note sizes of many megabytes thrown out by looking.
 
         ADD     size, size, #(freblksize-1)+4   ; Make block size granular
@@ -906,7 +920,7 @@ garfailed_zero * garfailed
 ; merge that with main memory too. Phew !
 
 FreeArea ROUT
-        Push    "addr, size, arse"
+        Push    "addr, size, work"
 
  [ debheap
 ; HpTemp not critical
@@ -925,7 +939,7 @@ FreeArea ROUT
         BL      FindHeapBlock
         BLVC    FreeChunkWithConcatenation
 
-        Pull    "addr, size, arse"
+        Pull    "addr, size, work"
         BVC     GoodHeapExit
         B       NaffHeapExit            ; VSet Exit
 
@@ -944,7 +958,7 @@ FreeArea ROUT
 
 ExtendBlock
 
-        Push    "addr, size, arse"
+        Push    "addr, size, work"
 
  [ debheap
 ; HpTemp not critical
@@ -993,9 +1007,9 @@ ExtendBlock
         ADDGT    addr, addr, bp            ; offset of block to free
         STRGT    size, [addr, hpd]         ; construct block for freeing
 
-        BL      FreeChunkWithConcatenation ; arse still set from block lookup
+        BL      FreeChunkWithConcatenation ; work still set from block lookup
 GoodExtension
-        Pull    "addr, size, arse"
+        Pull    "addr, size, work"
  [ DebugHeaps
         ADD     lr, size, #freblksize-1         ; work out how much we actually extended by
         BICS    lr, lr, #freblksize-1
@@ -1064,9 +1078,9 @@ MakeBlockBigger
  TEQP  PC, lr
  ]
 
-        LDR      arse, [addr, hpd]         ; get size back
-        ADD      arse, arse, size          ; new size
-        STR      arse, [addr, hpd]         ; block updated
+        LDR      work, [addr, hpd]         ; get size back
+        ADD      work, work, size          ; new size
+        STR      work, [addr, hpd]         ; block updated
 
 ; now see which we're extending into
         BNE      IntoFreeEntry
@@ -1080,8 +1094,8 @@ MakeBlockBigger
 03
  Pull HpTemp
  ]
-        ADD      arse, arse, addr
-        STR      arse, hpdbase
+        ADD      work, work, addr
+        STR      work, hpdbase
         B        GoodExtension
 
 IntoFreeEntry
@@ -1108,17 +1122,17 @@ IntoFreeEntry
         B        GoodExtension
 
 SplitFreeBlockForExtend
-        LDR      arse, [tp, hpd]
-        ADD      arse, arse, size
-        STR      arse, [tp, hpd]           ; prevnode points at right place
-        ADD      arse, arse, tp            ; offset of new free entry
-        ADD      arse, arse, hpd
+        LDR      work, [tp, hpd]
+        ADD      work, work, size
+        STR      work, [tp, hpd]           ; prevnode points at right place
+        ADD      work, work, tp            ; offset of new free entry
+        ADD      work, work, hpd
         SUB      HpTemp, HpTemp, size      ; new freblk size
-        STR      HpTemp, [arse, #fresize]
+        STR      HpTemp, [work, #fresize]
         LDR      HpTemp, [bp, hpd]
         CMP      HpTemp, #Nil
         SUBNE    HpTemp, HpTemp, size      ; reduced offset for free link
-        STR      HpTemp, [arse, #frelink]
+        STR      HpTemp, [work, #frelink]
         B        GoodExtension
 
 try_preceding_block
@@ -1166,7 +1180,7 @@ try_preceding_block
 hack_preceder
 ; bp is new size of preceding block
 ; tp is prevfree offset
-; arse is prevprevfree offset
+; work is prevprevfree offset
 ; size is amount block grows by
 ; addr is block offset
         CMP      bp, #0
@@ -1174,12 +1188,12 @@ hack_preceder
         STRNE    bp, [HpTemp, #fresize]    ; prevblock shrunk
         BNE      copy_backwards
 
- ; free freblk: arse is still prevprevblk pointer
+ ; free freblk: work is still prevprevblk pointer
         LDR      HpTemp, [tp, hpd]
         CMP      HpTemp, #Nil
         ADDNE    HpTemp, HpTemp, tp        ; offset from heap start
-        SUBNE    HpTemp, HpTemp, arse
-        STR      HpTemp, [arse, hpd]       ; free list updated
+        SUBNE    HpTemp, HpTemp, work
+        STR      HpTemp, [work, hpd]       ; free list updated
 
 copy_backwards
         ADD      bp, bp, tp
@@ -1215,8 +1229,8 @@ copy_backwards
 ; copy wackbords: HpTemp-4 bytes from addr+4 to bp, in appropriate order!
 cpe_prev
         SUBS     HpTemp, HpTemp, #4
-        LDRGT    arse, [addr, #4]!
-        STRGT    arse, [bp], #4
+        LDRGT    work, [addr, #4]!
+        STRGT    work, [bp], #4
         BGT      cpe_prev
         B        GoodExtension
  ]
@@ -1226,7 +1240,7 @@ try_add_preceding_block
 ; HpTemp is size of following block
         CMP      tp, #:INDEX: hpdfree  ; no real preceder?
         BEQ      got_to_reallocate
-        Push    "arse, size"           ; need prevprevblk ptr
+        Push    "work, size"           ; need prevprevblk ptr
         SUB      size, size, HpTemp    ; size still needed
         ADD      HpTemp, tp, hpd
         LDR      HpTemp, [HpTemp, #fresize]
@@ -1260,33 +1274,33 @@ try_add_preceding_block
 
         TEQP     PC, #SVC_mode+I_bit   ; IRQs off
    ; delink block at bp
-        LDR      arse, hpdbase
-        CMP      bp, arse              ; extend into free, or delink block?
+        LDR      work, hpdbase
+        CMP      bp, work              ; extend into free, or delink block?
         BNE      ext_delink
-        LDR      arse, hpdend
-        SUB      arse, arse, bp        ; get back real size
-        BIC      arse, arse, #(freblksize-1)
-        ADD      arse, arse, bp
-        STR      arse, hpdbase         ; all free allocated
+        LDR      work, hpdend
+        SUB      work, work, bp        ; get back real size
+        BIC      work, work, #(freblksize-1)
+        ADD      work, work, bp
+        STR      work, hpdbase         ; all free allocated
         B        ext_hack
 ext_delink
-        LDR      arse, [bp, hpd]
-        CMP      arse, #Nil
-        ADDNE    arse, arse, bp
-        SUBNE    arse, arse, tp
-        STR      arse, [tp, hpd]       ; block delinked
+        LDR      work, [bp, hpd]
+        CMP      work, #Nil
+        ADDNE    work, work, bp
+        SUBNE    work, work, tp
+        STR      work, [tp, hpd]       ; block delinked
 ext_hack
         MOV      bp, HpTemp
-        Pull    "arse, size"
+        Pull    "work, size"
 ; bp is new size of preceding block
 ; tp is prevfree offset
-; arse is prevprevfree offset
+; work is prevprevfree offset
 ; size is amount block grows by
 ; addr is block offset
         B        hack_preceder
 
 got_to_reallocate2
-       Pull     "arse, size"
+       Pull     "work, size"
   ]
 got_to_reallocate
 ; claim block of new size ; copy data
@@ -1304,8 +1318,8 @@ got_to_reallocate
         B       ReallocateInSafeZone
  |
         TEQP     PC, #SVC_mode+I_bit       ; no interrupts during this
-        LDR      arse, [addr, hpd]!        ; get block size, set block addr
-        ADD      size, size, arse
+        LDR      work, [addr, hpd]!        ; get block size, set block addr
+        ADD      size, size, work
         SUB      size, size, #4            ; block size to claim
         ADD      addr, addr, #4
         MOV      bp, addr                  ; address to copy from
@@ -1320,15 +1334,15 @@ got_to_reallocate
  LDR HpTemp, hpddebug
  CMP HpTemp, #0
  BEQ %FT06
- DREG arse, "got new block : copying "
+ DREG work, "got new block : copying "
 06
  ]
 
         STR      addr, [stack, #4]
 
-; claimed : copy arse-4 bytes from bp to addr
+; claimed : copy work-4 bytes from bp to addr
 CopyForExtension
-        SUBS     arse, arse, #4
+        SUBS     work, work, #4
         LDRGT    HpTemp, [bp],#4
         STRGT    HpTemp, [addr],#4
         BGT      CopyForExtension
@@ -1354,7 +1368,7 @@ CopyForExtension
  ]
 
 NaffExtension
-        Pull    "addr, size, arse"
+        Pull    "addr, size, work"
         B        NaffHeapExit
 
 
@@ -1446,10 +1460,10 @@ ExtendHeap_badshrink
 
 ReadBlockSize
 
-        Push    "addr, arse"
+        Push    "addr, work"
         BL      FindHeapBlock
         LDRVC   size, [addr, hpd]
-        Pull   "addr, arse"
+        Pull   "addr, work"
         BVC     GoodHeapExit
         B       NaffHeapExit
 
@@ -1461,7 +1475,7 @@ FindHeapBlock   ROUT
 ; Validate heap
 ; check block is an allocated block
 ; return tp = free list entry before the block (hpdfree if none)
-;      arse = free list before that (if exists)
+;      work = free list before that (if exists)
 ; corrupts HpTemp, bp
 
         Push    lr
@@ -1510,7 +1524,7 @@ FindHeapBlock   ROUT
 ; step down free list to find appropriate chunk
 ; get tp = free block before addr
 ; HpTemp =  "     "   after   "
-;   arse = block before tp
+;   work = block before tp
 
         MOV     tp, #:INDEX: hpdfree
 StepDownFreeList
@@ -1519,12 +1533,12 @@ StepDownFreeList
         BEQ     ListEnded             ; EQ state used!
         ADD     HpTemp, HpTemp, tp
         CMP     HpTemp, addr
-        MOVLS   arse, tp
+        MOVLS   work, tp
         MOVLS   tp, HpTemp
         BLS     StepDownFreeList
 ListEnded
         LDREQ   HpTemp, hpdbase      ; if EQ from CMP HpTemp, addr
-                                     ; then crap block anyway
+                                     ; then bad block anyway
         CMP     tp, #:INDEX: hpdfree
         MOVEQ   bp, #hpdsize         ; is this a fudge I see before me?
         BEQ     ScanAllocForAddr
@@ -1543,7 +1557,7 @@ ScanAllocForAddr
 ; HpTemp -> end    "   "        "
 ; scan to find addr, error if no in here
 
-       Push    arse       ; keep prevlink ptr
+       Push    work       ; keep prevlink ptr
 
   [ debheap
 ; HpTemp critical
@@ -1565,8 +1579,8 @@ ScanAllocForAddr
 ScanAllocForAddrLoop
         CMP     bp, addr
         BEQ     ValidBlock
-        LDR     arse, [bp, hpd]    ; get size
-        ADD     bp, bp, arse
+        LDR     work, [bp, hpd]    ; get size
+        ADD     bp, bp, work
 CheckForNullAllocn
         CMP     bp, HpTemp
         BLT     ScanAllocForAddrLoop
@@ -1580,11 +1594,11 @@ CheckForNullAllocn
      [ International
        BL      TranslateError
      ]
-       Pull   "arse, lr"
+       Pull   "work, lr"
        ORRS    PC, lr, #V_bit
 
 ValidBlock    ; tp = free link offset, addr = block offset
-       Pull   "arse, lr"
+       Pull   "work, lr"
        BICS    PC, lr, #V_bit
 
 findfailed_badhpd
@@ -1689,7 +1703,7 @@ NoConcatWithNext  ; tp = free link offset, addr = block offset
  WRLN "concatenating with block before"
  STRIM "prevfree = "
  Push  R0
- MOV   R0, arse
+ MOV   R0, work
  BL    PrintOffsetLine
  Pull  R0
 06
@@ -1699,7 +1713,7 @@ NoConcatWithNext  ; tp = free link offset, addr = block offset
         ADD    size, bp, size          ; new free block size
         TEQP   PC, #SVC_mode+I_bit
         STR    size, [HpTemp, #fresize]
-; now check for butts against base : arse is still prevnode to tp
+; now check for butts against base : work is still prevnode to tp
         ADD    HpTemp, size, tp
         LDR    bp, hpdbase
         CMP    bp, HpTemp
@@ -1707,7 +1721,7 @@ NoConcatWithNext  ; tp = free link offset, addr = block offset
         SUB    bp, bp, size
         STR    bp, hpdbase           ; step unused bit back
         MOV    bp, #Nil              ; this MUST have been last free block!
-        STR    bp, [arse, hpd]
+        STR    bp, [work, hpd]
         ORRS   PC, lr, #I_bit        ; Whew!
 
 NoConcatenation ; check if block butts against base
@@ -1768,7 +1782,7 @@ ShowHeap
 
 iShowHeap ROUT ; Internal entry point for debugging heap
 
-        Push    "r0, hpd, addr, size, arse, bp, tp, link"
+        Push    "r0, hpd, addr, size, work, bp, tp, link"
 
         ValidateHpd showfailed  ; debugging heaps won't work interruptibly
 
@@ -1777,7 +1791,7 @@ iShowHeap ROUT ; Internal entry point for debugging heap
         ADDNE   tp, tp, #:INDEX: hpdfree
         LDR     bp, hpdbase
         MOV     addr, #hpdsize
-        LDR     arse, hpdend
+        LDR     work, hpdend
 
         SWI     OS_NewLine              ; Initial blurb about hpd contents
         DREG    hpd, "**** Heap map **** : hpd "
@@ -1791,10 +1805,10 @@ iShowHeap ROUT ; Internal entry point for debugging heap
         MOV     r0, addr
         BL      PrintOffset
         STRIM   ",  end"
-        MOV     r0, arse
+        MOV     r0, work
         BL      PrintOffsetLine
 
-        SUB     r0, arse, bp            ; hpdend-hpdbase
+        SUB     r0, work, bp            ; hpdend-hpdbase
         DREG    r0,"Bytes free: ",concat, Word
         SUB     r0, bp, addr            ; hpdbase-hpdsize
         DREG    r0,", bytes used: ",, Word
@@ -1856,12 +1870,12 @@ iShowHeap ROUT ; Internal entry point for debugging heap
         SWI     XOS_NewLine
 
 99
-        GRABS  "r0, hpd, addr, size, arse, bp, tp, pc"
+        GRABS  "r0, hpd, addr, size, work, bp, tp, pc"
 
 
 showfailed_badhpd
         WRLN    "Invalid heap descriptor : ShowHeap failed"
-        GRABS    "r0, hpd, addr, size, arse, bp, tp, pc"
+        GRABS    "r0, hpd, addr, size, work, bp, tp, pc"
 
 
 HexUsedBlk
@@ -1907,8 +1921,8 @@ HeapCode_end
 
 ; ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        $HeapCrapAsModuleBRA
+        $HeapBadAsModuleBRA
         InsertDebugRoutines
-        $HeapCrapAsModuleKET
+        $HeapBadAsModuleKET
 
         END

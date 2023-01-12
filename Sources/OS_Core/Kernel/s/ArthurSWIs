@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
         TTL     => ArthurSWIs - ReadUnsigned, Vectors, Bits
 
 ;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -29,7 +43,7 @@ ReadUnsigned_Routine ENTRY "r0-r1, r3-r4, r9"
 
 ; first set range limit
         MOV     r9, r2            ; limit value
-        TST     r0, #3 :SHL: 29 
+        TST     r0, #3 :SHL: 29
         MOVEQ   r9, #-1           ; used unsigned; allows anything
         TSTNE   r0, #1 :SHL: 30
         MOVNE   r9, #&FF
@@ -111,7 +125,7 @@ ReadUnsigned_Routine ENTRY "r0-r1, r3-r4, r9"
         Pull    "r0,lr"
       ]
 
-95      
+95
         STR     r2, [stack]     ; Go set the current error
         PullEnv
         MOV     r2, #0          ; Defined to return 0 on error
@@ -271,7 +285,7 @@ CallVecLoop
         BNE     CallVecLoop
 
         Pull    pc,,^                   ; we don't expect to get to here
-                                        ; (should always be claimed), 
+                                        ; (should always be claimed),
                                         ; but return to caller, restoring flags
 
 ;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -303,7 +317,7 @@ ClaimVector_SWICode   ROUT
         TEQEQP  R4, PC                  ; No, then set it, save changed bits
         MOVNE   R4, #0                  ; Else no changed bits
 
-        MOV     R3, #0                  ; List of de-linked nodes is empty        
+        MOV     R3, #0                  ; List of de-linked nodes is empty
         LDR     R11, =VecPtrTab         ; Get ptr to table of head pointers
         LDR     R10, [R11, R0, LSL #2]! ; R10 "nextblock" := *oldptr, R11= root ptr
 01      BL      FindAndDelinkNode       ; R10,R11->R10,R11,R12
@@ -322,7 +336,7 @@ ClaimVector_SWICode   ROUT
  |
       TEQP  PC, #SVC_mode+I_bit     ; IRQs off while holding context.
       LDR   R11, =VecPtrTab         ; Point at table of head pointers
-      LDR   R10, [R11, R0, LSL #2]! ; R10 "nextblock" := !oldptr, 
+      LDR   R10, [R11, R0, LSL #2]! ; R10 "nextblock" := !oldptr,
                                     ; point R11 at the table entry "oldptr"
 01    BL    FreeLink
       BVC   %BT01                   ; loop with chain pointers still set
@@ -375,8 +389,8 @@ ReleaseVector_SWICode
         MOV     R9, #I_bit
         TST     R9, PC                  ; is I_bit set ?
         TEQEQP  R9, PC                  ; No, then set it, R9 = changed bits
-        MOVNE   R9, #0                  ; Else R9=0 for no change 
-        
+        MOVNE   R9, #0                  ; Else R9=0 for no change
+
         LDR     R11, =VecPtrTab         ; Get ptr to table of head pointers
         LDR     R10, [R11, R0, LSL #2]! ; R10 "nextblock" := *oldptr, R11= root ptr
         BL      FindAndDelinkNode       ; R10,R11->R10,R11,R12
@@ -389,7 +403,7 @@ ReleaseVector_SWICode
 
       TEQP  PC, #SVC_mode+I_bit     ; IRQs off while holding context.
       LDR   R11, =VecPtrTab         ; Point at table of head pointers
-      LDR   R10, [R11, R0, LSL #2]! ; R10 "nextblock" := !oldptr, 
+      LDR   R10, [R11, R0, LSL #2]! ; R10 "nextblock" := !oldptr,
                                     ; point R11 at the table entry "oldptr"
       BL    FreeLink
       Pull "R0-R2, link"
@@ -435,7 +449,7 @@ FindAndDelinkNode
         BNE     %BT10                   ; No then jump, try next node
 
 ; Remove node from vector chain
-                   
+
         MOV     R12, R10                ; R12-> node to de-link
         LDR     R10, [R12, #TailPtr]    ; Get link to next node
         STR     R10, [R11]              ; Previous node's link -> next node
@@ -494,7 +508,7 @@ defaultvectab
    & 0, 0, NewRdch              ; RdchV  * &04  - start of VecNo=SWINo section
    & 0, 0, VecOsCli
    & 0, OsbyteVars, OsByte
-   & 0, OsbyteVars, OsWord    
+   & 0, OsbyteVars, OsWord
    & 0, 0, NaffVector             ; filev
    & 0, 0, NaffVector             ; argsv
    & 0, 0, NaffVector             ; bgetv
@@ -577,7 +591,7 @@ Application_Delink ROUT
       Push "R0, R2-R4, lr"
 
       CMP   R1, #4
-      BLT   %FT99                   ; stupid buffer size
+      BLT   %FT99                   ; invalid buffer size
 
       MOV   R3, #NVECTORS-1
       LDR   R4, [R3, #AplWorkSize-(NVECTORS-1)]

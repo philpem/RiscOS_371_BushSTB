@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
         TTL     => Oscli - main Oscli code and system commands.
 
         GBLL    redirectinkey
@@ -43,7 +57,7 @@ doredirect ROUT
            STRNEB  R0, [R0, #RedirectOutHandle]
            CMP     R1, #0
            SWINE   XOS_Find             ; close any previous File
-           MOV     R12, R1              ; don't really care if handle was crap
+           MOV     R12, R1              ; don't really care if handle was invalid
            LDR     R1, =RedirectBuff
            ORR     R0, R2, #open_mustopen + open_nodir
            SWI     XOS_Find             ; Open the File
@@ -131,7 +145,7 @@ OscliStackFull
          ADR        R0, ErrorBlock_StackFull
        [ International
          BL         TranslateError
-       ]  
+       ]
          Pull      "lr"
          ORRS       PC, lr, #V_bit
 
@@ -317,9 +331,9 @@ pfssss   LDRB      R10, [R1], #1
       Push  "R0, R3-R6"
     [ International
       MOV    R3,#0
-      LDRB   R6,[R3,#ErrorSemaphore]            ; We are about to get lots of buffer overflow errors, 
+      LDRB   R6,[R3,#ErrorSemaphore]            ; We are about to get lots of buffer overflow errors,
       SUB    R6,R6,#1
-      STRB   R6,[R3,#ErrorSemaphore]             
+      STRB   R6,[R3,#ErrorSemaphore]
     ]
       MOV    R6, R0
       MOV    R3, #:LEN: "Alias$"
@@ -662,7 +676,7 @@ nogstransingta
 
          SUB     R0, R6, #1                   ; parameter pointer
          SWI     XOS_GSTrans
-         BCS     buffer_overflowed_what_a_cunt
+         BCS     buffer_overflowed_oh_bother
          BVS     bad_string
 
          CMP     R2, #0
@@ -686,7 +700,7 @@ preversion_detectified
          BL      TranslateError
        ]
          B       pgstcomm
-buffer_overflowed_what_a_cunt
+buffer_overflowed_oh_bother
          ADRL    R0, ErrorBlock_OscliLongLine
        [ International
          BL      TranslateError
@@ -714,7 +728,7 @@ AddCharForGSTP
          ADDLT   R10, R10, #1
          MOVLT   PC, lr
          Push   "R0-R2"
-         B       buffer_overflowed_what_a_cunt
+         B       buffer_overflowed_oh_bother
 
 stripnextparm
          Push   "R11"

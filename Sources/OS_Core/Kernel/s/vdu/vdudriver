@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.VduDriver
 ;
 ; ARTHUR OPERATING SYSTEM - Vdu Drivers
@@ -17,8 +31,8 @@ DoVdu23_0_12   SETL  {FALSE}
         GBLL    BleedinDaveBell
 BleedinDaveBell SETL {TRUE}
 
-        GBLL    LCDPowerCtrl
-LCDPowerCtrl    SETL {TRUE}
+	GBLL	LCDPowerCtrl
+LCDPowerCtrl	SETL {TRUE} :LAND: :LNOT: STB
 
         GET s.vdu.VduDecl
         GET s.vdu.VduGrafDec
@@ -576,8 +590,10 @@ VduBadExit                              ; jumped to if an error in VDU code
 
 ModeChangeSub ROUT
         Push    lr
+        [ :LNOT: STB
         MOV     r1, #0
         STRB    r1, [r1, #LCD_Active]   ;Default to non-lcd active, single panel (mainly for Stork power-saving info)
+        ]
         MOV     R1, #Service_PreModeChange
         IssueService
         TEQ     R1, #0                  ; was service claimed ?
@@ -692,17 +708,17 @@ ModeChangeSub ROUT
         BL      IssueModeService
 
 
-        [ LCDPowerCtrl
-        ;Switch LCD off here if it is _not_ an LCD mode
-        MOV     R3, #0
-        LDRB    R3, [R3, #LCD_Active]
-        ANDS    R0, R3, #&7F            ;Pick out the lcd mode bits, ignoring the single/dual panel bit
-        Push    "r0-r1"
-        MOVEQ   R0, #0
-        LDREQ   R1, =:NOT:(PortableControl_LCDEnable :OR: PortableControl_BacklightEnable)
-        SWIEQ   XPortable_Control
-        Pull    "r0-r1"
-        ]
+	[ LCDPowerCtrl :LAND: :LNOT: STB
+	;Switch LCD off here if it is _not_ an LCD mode
+	MOV	R3, #0
+	LDRB	R3, [R3, #LCD_Active]
+	ANDS	R0, R3, #&7F		;Pick out the lcd mode bits, ignoring the single/dual panel bit
+	Push	"r0-r1"
+	MOVEQ	R0, #0
+	LDREQ	R1, =:NOT:(PortableControl_LCDEnable :OR: PortableControl_BacklightEnable)
+	SWIEQ	XPortable_Control
+	Pull	"r0-r1"
+	]
 
 ; R13 -> mode variables
 
@@ -857,17 +873,17 @@ ModeChangeSub ROUT
 
    [ {FALSE}   ;DEBUGGING CODE - DUMPS THE VIDC REGISTER TABLE TO A FILE (DONE FOR LCDSUPPORT)
 
-        Push    "r0-r12"
+	Push	"r0-r12"
 
-        MOV     r10, #0
-        LDRB    r10, [r10, #LCD_Active]
-        CMP     r10, #2
+	MOV	r10, #0
+	LDRB	r10, [r10, #LCD_Active]
+	CMP	r10, #2
 
-        Pull    "r0-12", NE
-        BNE     %FT20
+	Pull    "r0-12", NE
+	BNE     %FT20
 
-        MOV     r10, r0
-        MOV     r11, r1
+	MOV	r10, r0
+	MOV	r11, r1
 
         ! 0, "**** WARNING: VIDC List debugging assembled in ****"
 
@@ -876,11 +892,11 @@ ModeChangeSub ROUT
         SWI     XOS_Find
 
         Pull    "r0-r12", VS
-        BVS     %FT20
+	BVS	%FT20
 
         MOV     r1, r0
         MOV     r0, #2
-        MOV     r2, r10
+	MOV	r2, r10
         MOV     r3, r11
         SWI     XOS_GBPB
 
@@ -1128,7 +1144,7 @@ DbgFilename
         TubeString r8, r9, r10, " ",cc ; pad out to 10 chars
  ]
 
-  [ StorkPowerSave
+  [ StorkPowerSave :LAND: :LNOT: STB
         TEQ     R6, #VIDCExternal
         STREQ   R2, [WsPtr, #VIDCExternalSoftCopy]
         TEQ     R6, #VIDCFSyn
@@ -1169,17 +1185,17 @@ DbgFilename
         BL      SetMouseRectangle
         BL      FF
 
-        [ LCDPowerCtrl
-        ;Switch the LCD on if LCD mode
-        Push    "r0"
-        MOV     R1, #0
-        LDRB    R1, [R1, #LCD_Active]
-        ANDS    R1, R1, #&7F            ;Check the LCD mode bits only, not the single/dual panel bit
-        LDRNE   R0, =(PortableControl_LCDEnable :OR: PortableControl_BacklightEnable)
-        LDRNE   R1, =:NOT:(PortableControl_LCDEnable :OR: PortableControl_BacklightEnable)
-        SWINE   XPortable_Control
-        Pull    "r0"
-        ]
+	[ LCDPowerCtrl :LAND: :LNOT: STB
+	;Switch the LCD on if LCD mode
+	Push	"r0"
+	MOV	R1, #0
+	LDRB	R1, [R1, #LCD_Active]
+	ANDS	R1, R1, #&7F		;Check the LCD mode bits only, not the single/dual panel bit
+	LDRNE	R0, =(PortableControl_LCDEnable :OR: PortableControl_BacklightEnable)
+	LDRNE	R1, =:NOT:(PortableControl_LCDEnable :OR: PortableControl_BacklightEnable)
+	SWINE	XPortable_Control
+	Pull	"r0"
+	]
 
         MOV     R1, #Service_ModeChange
         BL      IssueModeService
@@ -2022,10 +2038,12 @@ FIFOLoadTable
 
         ! 0, "**** WARNING: Mode change debugging assembled in ****"
 
-        MOV     r0, #0
-        LDRB    r0, [r0, #LCD_Active]
-        CMP     r0, #2
+        [ :LNOT: STB
+	MOV	r0, #0
+	LDRB	r0, [r0, #LCD_Active]
+	CMP	r0, #2
         Pull    "r0, r1, r2-r4, r7-r11, pc", NE
+        ]
 
 
         MOV     r0, #&80
@@ -2080,15 +2098,19 @@ ProcessControlListItem ENTRY
         &       ProcessControlListDPMSState             ; 11 - DPMS state
 
 ProcessControlListLCDMode
+        [ STB
+        MOV     r1, #Ext_LCDGrey
+        |
         MOV     r0, #0
-        LDRB    r1, [r0, #LCD_Active]           ;Read the existing value
-        AND     r1, r1, #&80                    ;Clear all but the single/dual bit, 'cos this might have been set already
-        ORR     r1, r1, r2                      ;Bung our new lcdmode into the byte, and....
+	LDRB	r1, [r0, #LCD_Active]		;Read the existing value
+	AND	r1, r1, #&80			;Clear all but the single/dual bit, 'cos this might have been set already
+	ORR	r1, r1, r2			;Bung our new lcdmode into the byte, and....
         STRB    r1, [r0, #LCD_Active]           ;...store in the KernelWS which LCD mode we are in.
-        MOV     r1, #Ext_ECKOn                  ;Set the ECLK on
+        MOV     r1, #Ext_ECKOn			;Set the ECLK on
 
-        CMP     r2, #3                          ;Was (is) it active-matrix?
-        ORRNE   r1, r1, #Ext_LCDGrey            ;If not, set the LCD greyscaler 'on'
+	CMP	r2, #3				;Was (is) it active-matrix?
+	ORRNE	r1, r1, #Ext_LCDGrey		;If not, set the LCD greyscaler 'on'
+	]
 05
         MOV     r0, #VIDCExternal
 10
@@ -2125,9 +2147,14 @@ ProcessControlListExternalRegister
         B       %BT15
 
 ProcessControlListLCDDualPanelMode
+        [ STB
+        MOV     r0, #VIDCControl
+        MOV     r1, #CR_DualPanel
+        B       %BT10
+        |
         MOV     r0, #0
-        LDRB    r1, [r0, #LCD_Active]
-        ORR     r1, r1, #&80                    ;Set the top bit & leave the rest as-is
+	LDRB	r1, [r0, #LCD_Active]
+	ORR	r1, r1, #&80			;Set the top bit & leave the rest as-is
         STRB    r1, [r0, #LCD_Active]           ;Store in the KernelWS that we are in dual-panel LCD mode.
         LDR     r0, [r9, #VIDCDataControl :SHR: 22]
         MOV     r1, r0, LSL #(31-10)            ;Put HDWR bits to the top
@@ -2136,42 +2163,43 @@ ProcessControlListLCDDualPanelMode
         STR     r0, [r9, #VIDCDataControl :SHR: 22]
 
         LDR     r0, [r9, #VertiDisplayEnd :SHR: 22]
-        LDR     r1, [r9, #VertiDisplayStart :SHR: 22]
-        BIC     r0, r0, #VertiDisplayEnd
-        BIC     r1, r1, #VertiDisplayStart
-        SUB     r0, r0, r1                      ;R0 = Vres
-        ADD     r1, r1, r0, LSR #1              ;R1 = Vres/2 + VDSR
-        ORR     r1, r1, #VertiDisplayEnd
-        STR     r1, [r9, #VertiDisplayEnd :SHR: 22]
+	LDR	r1, [r9, #VertiDisplayStart :SHR: 22]
+	BIC	r0, r0, #VertiDisplayEnd
+	BIC	r1, r1, #VertiDisplayStart
+	SUB	r0, r0, r1			;R0 = Vres
+	ADD	r1, r1, r0, LSR #1		;R1 = Vres/2 + VDSR
+	ORR	r1, r1, #VertiDisplayEnd
+	STR	r1, [r9, #VertiDisplayEnd :SHR: 22]
 
-        LDR     r1, [r9, #VertiCycle :SHR: 22]
-        BIC     r1, r1, #VertiCycle
-        SUB     r1, r1, r0, LSR #1
-        ORR     r1, r1, #VertiCycle
-        STR     r1, [r9, #VertiCycle :SHR: 22]
+	LDR	r1, [r9, #VertiCycle :SHR: 22]
+	BIC	r1, r1, #VertiCycle
+	SUB	r1, r1, r0, LSR #1
+	ORR	r1, r1, #VertiCycle
+	STR	r1, [r9, #VertiCycle :SHR: 22]
 
-        LDR     r1, [r9, #VertiBorderEnd :SHR: 22]
-        BIC     r1, r1, #VertiBorderEnd
-        SUB     r1, r1, r0, LSR #1
-        ORR     r1, r1, #VertiBorderEnd
-        STR     r1, [r9, #VertiBorderEnd :SHR: 22]
+	LDR	r1, [r9, #VertiBorderEnd :SHR: 22]
+	BIC	r1, r1, #VertiBorderEnd
+	SUB	r1, r1, r0, LSR #1
+	ORR	r1, r1, #VertiBorderEnd
+	STR	r1, [r9, #VertiBorderEnd :SHR: 22]
 
-        LDR     r1, [r9, #VIDCExternal :SHR: 22]
-        BIC     r1, r1, #Ext_ERegExt
-        ORR     r1, r1, #Ext_ERegGreen
-        STR     r1, [r9, #VIDCExternal :SHR: 22]
+	LDR	r1, [r9, #VIDCExternal :SHR: 22]
+	BIC	r1, r1, #Ext_ERegExt
+	ORR	r1, r1, #Ext_ERegGreen
+	STR	r1, [r9, #VIDCExternal :SHR: 22]
 
         MOV     r0, #VIDCControl
         MOV     r1, #CR_DualPanel
         B       %BT10
+        ]
 
 ProcessControlListLCDOffsetRegister0
         MOV     r0, #LCDOffsetRegister0
 20
         ORR     r2, r2, r0                      ; put high bits of register at top
         STR     r2, [r9, r0, LSR #22]           ; and store in array
-        MOV     r0, #VIDC                       ;ACTUALLY PROGRAM VIDC (I know I shouldn't but I don't care - I've got a cold)
-        STR     r2, [r0]
+	MOV	r0, #VIDC			;ACTUALLY PROGRAM VIDC (I know I shouldn't but I don't care - I've got a cold)
+	STR	r2, [r0]
         EXIT
 
 ProcessControlListLCDOffsetRegister1
@@ -2213,6 +2241,26 @@ BestRangeError          #       4
 ComputeModuliStack      *       :INDEX: @
 
 ComputeModuli ENTRY "r2-r12", ComputeModuliStack
+  [ UseHClk :LAND: STB
+
+; TMD 09-Oct-96: Only check monitor lead type if there is the hardware, otherwise assume just TV
+   [ IOMD_C_MonitorType <> 0
+	BL	TranslateMonitorLeadType	; -> r3=mode, r4=monitor, r5=sync
+	CMP	r4, #3
+	BEQ	%FT05
+   ]
+
+; Use HClk
+	LDR	r1, =12500		; if desired pixel clock
+	CMP	r0, r1
+	MOVCC	r1, #CR_HCLK :OR: ((2-1) :SHL: CR_PixelDivShift)	; if < 12.5MHz, use divide by 2
+	MOVCS	r1, #CR_HCLK :OR: ((1-1) :SHL: CR_PixelDivShift)	; else use divide by 1
+	LDR	r0, =63 :OR: (1 :SHL: FSyn_VShift) ; minimum V, maximum R
+	EXIT
+  ]
+
+; Use VCLK/RCLK
+05
         MOV     r12, #-1                ; smallest error for values in or out of VCO range
         MOV     r11, #-1                ; smallest error for values in VCO range
         STR     r11, BestDInRange
@@ -2395,7 +2443,7 @@ OfferModeExtension ROUT
         Push    "r1,r2,r4,r5,r14"
 
 ; TMD 10-Jan-94 - added code here to check for erroneous passing in of a sprite mode word.
-; This prevents data aborts when modules try to index off a stupid address.
+; This prevents data aborts when modules try to index off a bad address.
 ;
 ; We could have done OS_ValidateAddress, but that would be rather slow, and mode selectors
 ; are of indeterminate length.

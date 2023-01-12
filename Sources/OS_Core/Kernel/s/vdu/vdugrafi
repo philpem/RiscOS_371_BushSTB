@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.VduGrafI
 ;
 ; ARTHUR OPERATING SYSTEM - Vdu Drivers
@@ -48,7 +62,7 @@ FlipAboutXAxis ROUT
 
         ADD     R0, R0, R7              ; Update the start pointer
 
-        ;If a new format sprite (we know it has a mask) 
+        ;If a new format sprite (we know it has a mask)
         ;redo R1 & call the 'GetMaskspWidth' routine to alter R3
 
         LDR     R8, [R2, #spMode]       ; Get sprite mode
@@ -150,12 +164,12 @@ FlipAboutYAxis ROUT
         Push    "R0, R2, R5-R8"
         BL      FlipAbY10               ; Do the sprite image
         Pull    "R0, R2, R5-R8"
-        
+
         Push    "R0,R8"
         LDR     R8, [R2, #spMode]       ; Get sprite mode
         MOVS    R8, R8, LSR #27         ; Isolate sprite type & test for 0
         BEQ     %FT03                   ; If old format ignore next bit
-        
+
         ; If this is a new format sprite we may have to remove any LH
         ; wastage that was created by the flip.
         CMP     R6, #0                  ; Is there any LH wastage?
@@ -245,7 +259,7 @@ FlipAboutYAxis ROUT
 ; Internally:
 ;       R0  RowPtr, R1 LPtr , R2 RPtr , R3 Row offset, R4 EndAdr
 ;       R5  LWord , R6 RWord, R7 LTemp, R8 RTemp     , R9 LPixMask
-;       R10 RPixMask, R11 ShftFactor, R14 Cnt 
+;       R10 RPixMask, R11 ShftFactor, R14 Cnt
 
 ; R0-R2, R5-R8 get corrupted
 
@@ -283,7 +297,7 @@ FlipAbY10
 ;
 ;       RemLHWastage - Dedicated routine to remove x bits of LH wastage
 ;                      after a new format Sprite has been flipped
-;       
+;
 ;       On Entry:    R0 = Start of data
 ;                    R3 = Row Offset
 ;                    R4 = End of data

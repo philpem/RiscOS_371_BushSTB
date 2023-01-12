@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > MEMC2
 
 ; MEMC interface file - MEMC2 version
@@ -120,7 +134,7 @@ BangCam
         LDRB    r0, [r0, r11]
         ORR     r0, r0, r2, LSL #3      ; value to store in level 2 page table
                                         ; is PPL :OR: (phys page number << 3)
-        
+
         LDR     r1, =PhysRAML2PT        ; point to level 2 page tables
 
 BangL2PT                                ; internal entry point used only by BangCamUpdate
@@ -303,7 +317,7 @@ ClockTimingTable
 J0      &       &F200   ; 3   / 2
 J1      &       &F200   ; 3   / 2
 RSPEED  &       &1C00   ; 3   / 3
-ISPEED  &       &B800   ; 2.5 / 2.5   
+ISPEED  &       &B800   ; 2.5 / 2.5
 
 DRAMTimingTable
 RWT0    &       &2A320
@@ -316,7 +330,7 @@ RSQ1    &       &0B200
 
 rtype_value     &       &3333   ; Bank Type [x,bank,s1,s0] * 4 ; set largest memory type by default
 
-refr_value      &       &1086   ; Enable refresh, refresh length = 10 hclk ticks, refresh period = 12us   
+refr_value      &       &1086   ; Enable refresh, refresh length = 10 hclk ticks, refresh period = 12us
 
 ; -> MemSize
 
@@ -345,13 +359,13 @@ refr_value      &       &1086   ; Enable refresh, refresh length = 10 hclk ticks
 ;
 ;   8MByte      32k        2*32*1Mx1         A13,A20,A21,A22 distinct, A23 fail
 ;   8MByte      32k         8*8*256kx4       A13,A20,A21,A22 distinct, A23 fail
-; 
+;
 ;   4Mbyte      32k          32*1Mx1         A13,A21,A20 distinct, A22,A23 fail
 ;   4Mbyte      32k         4*8*256kx4       A13,A21,A20 distinct, A22,A23 fail
 ;
 ;   2Mbyte      32k    expandable 2*8*256kx4 A13,A20 distinct, A21 fails
 ;   2Mbyte ???  16k      fixed 2*8*256kx4    A13,A21 distinct, A20 fails
-;   
+;
 ;   1Mbyte       8k          32*256kx1       A13,A20 fail, A19,A18,A12 distinct
 ;   1Mbyte       8k           8*256kx1       A13,A20 fail, A19,A18,A12 distinct
 ;   1Mbyte       8k          4*8*64kx4       A13,A20 fail, A19,A18,A12 distinct
@@ -359,8 +373,8 @@ refr_value      &       &1086   ; Enable refresh, refresh length = 10 hclk ticks
 ; 512Kbyte       8k    expandable 2*8*64kx4  A13,A20,A19 fail, A12,A18 distinct
 ; 512Kbyte       4k      fixed 2*8*64kx4     A13,A20,A12 fail, A19,A18 distinct
 ;
-; 256Kbyte       4K           8*64kx4        A13,A20,A12,A18 fail, A21,A19 ok  
-; 256Kbyte       4K          32*64kx1        A13,A20,A12,A18 fail, A21,A19 ok  
+; 256Kbyte       4K           8*64kx4        A13,A20,A12,A18 fail, A21,A19 ok
+; 256Kbyte       4K          32*64kx1        A13,A20,A12,A18 fail, A21,A19 ok
 ;
 
 Z_Flag     * &40000000
@@ -402,7 +416,7 @@ MemSize ROUT
 
 ; having set up the DRAM multiplexing correctly, we can now zap the L2PT
 ; to no access for any page
-                           
+
         LDR     r1, =PhysRAML2PT
         ADD     r2, r1, #2*8*1024               ; two L2PT tables at the moment
         MOV     r3, #0                          ; page 0, no access

@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.VduGrafK
 ;
 ; ARTHUR OPERATING SYSTEM - Vdu Drivers
@@ -214,7 +228,7 @@ ScreenLoad ROUT
         BL      WritePaletteFromSprite          ; mode change (if needed)
         ;branch to 75 rather than 70 because RetnRegR0 is already set up
         BVS     %FT75                           ; and palette setting
-                       
+
       [ {TRUE}
         GraphicsMode R0
         BNE     %FT60
@@ -222,7 +236,7 @@ ScreenLoad ROUT
         LDR     R0, [WsPtr, #NPix]
         CMP     R0, #0
         BEQ     %FT60                   ; quit with error if not graphics mode
-      ]       
+      ]
 
 ; now check for being able to do it all at once
 

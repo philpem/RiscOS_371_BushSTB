@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > Copro15ops
 
 ;macros for Coprocessor #15 operations (configuration), which run-time detect
@@ -28,7 +42,7 @@ ARM8_CTC_reg         CN 15  ;Clock and test configuration
 
 ARMA_TCI_reg         CN 15  ;Test,Clock and Idle control
 
-;so that bleedin' AASM will accept the general value for MCR CRm field
+;so that AASM will accept the general value for MCR CRm field
 C0  CN  0
 C1  CN  1
 C2  CN  2
@@ -79,7 +93,7 @@ C15 CN 15
 ;bits 15:12 of returned ID will be 0,7,8,10 for ARM 6,7,8,A
         MACRO
         ARM_read_ID $id,$cond
-        MRC$cond ARM_config_cp,0,$id,ARM_ID_reg,C0,0  
+        MRC$cond ARM_config_cp,0,$id,ARM_ID_reg,C0,0
         MEND
 
 ;read ARM 'number' (6,7,8,&A currently) into $num
@@ -218,7 +232,7 @@ C15 CN 15
 ;
         MACRO
         ARM8_cleanflush_IDCentry $reg,$cond
-  [ ARM810cleanflushbroken      
+  [ ARM810cleanflushbroken
         ARM8_clean_IDCentry $reg,$cond
         ARM8_flush_IDCentry $reg,$cond
   |

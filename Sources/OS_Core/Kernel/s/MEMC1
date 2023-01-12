@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > MEMC1
 
 ; MEMC interface file - MEMC1 version
@@ -108,7 +122,7 @@ BangCam
 
 03      ORR     R4, R4, #CAM
         ORR     R4, R4, R11, LSL #8     ; stuff in PPL
-        STR     R4, [R4]                ; and bang the bugger in
+        STR     R4, [R4]                ; and write it
         MOV     PC, LR
 
 ; Data to drive CAM setting
@@ -297,13 +311,13 @@ InitMEMC ROUT
 ;
 ;   8MByte      32k        2*32*1Mx1         A13,A20,A21,A22 distinct, A23 fail
 ;   8MByte      32k         8*8*256kx4       A13,A20,A21,A22 distinct, A23 fail
-; 
+;
 ;   4Mbyte      32k          32*1Mx1         A13,A21,A20 distinct, A22,A23 fail
 ;   4Mbyte      32k         4*8*256kx4       A13,A21,A20 distinct, A22,A23 fail
 ;
 ;   2Mbyte      32k    expandable 2*8*256kx4 A13,A20 distinct, A21 fails
 ;   2Mbyte ???  16k      fixed 2*8*256kx4    A13,A21 distinct, A20 fails
-;   
+;
 ;   1Mbyte       8k          32*256kx1       A13,A20 fail, A19,A18,A12 distinct
 ;   1Mbyte       8k           8*256kx1       A13,A20 fail, A19,A18,A12 distinct
 ;   1Mbyte       8k          4*8*64kx4       A13,A20 fail, A19,A18,A12 distinct
@@ -311,8 +325,8 @@ InitMEMC ROUT
 ; 512Kbyte       8k    expandable 2*8*64kx4  A13,A20,A19 fail, A12,A18 distinct
 ; 512Kbyte       4k      fixed 2*8*64kx4     A13,A20,A12 fail, A19,A18 distinct
 ;
-; 256Kbyte       4K           8*64kx4        A13,A20,A12,A18 fail, A21,A19 ok  
-; 256Kbyte       4K          32*64kx1        A13,A20,A12,A18 fail, A21,A19 ok  
+; 256Kbyte       4K           8*64kx4        A13,A20,A12,A18 fail, A21,A19 ok
+; 256Kbyte       4K          32*64kx1        A13,A20,A12,A18 fail, A21,A19 ok
 ;
 
 Z_Flag     * &40000000

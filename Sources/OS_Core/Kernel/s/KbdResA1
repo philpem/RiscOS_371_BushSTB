@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > KbdResA1
 
 ; This file contains all the old-style keyboard control stuff that the kernel does on reset
@@ -147,17 +161,17 @@ keytransmission
 
 fartaboutfornewkbd
 
-kickthebastardagain
+kickitagain
         MOV     R11, #HRDRESET
         BL      SendAndPollRxBit        ; get a byte to R11
         BL      PollTxBit
         CMP     R11, #HRDRESET
-        BNE     kickthebastardagain
+        BNE     kickitagain
         MOV     R11, #RST1ACK
         BL      SendAndPollRxBit        ; get a byte to R11
         BL      PollTxBit
         CMP     R11, #RST1ACK
-        BNE     kickthebastardagain
+        BNE     kickitagain
         MOV     R10, #RST2ACK
         B       send_ack_byte
 
@@ -198,7 +212,7 @@ send_ack_byte
         SUBS    PC, R14, #4
 
  DCD 0 ; temp fudge
- 
+
  [ Keyboard_Type = "A1A500"
   [ . :AND: 255 = 0
  DCB "S" ; Odd length, should throw us

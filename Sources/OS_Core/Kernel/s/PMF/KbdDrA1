@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > Sources.PMF.KbdDrA1
 
 ; Archimedes keyboard driver.
@@ -226,7 +240,7 @@ KeyIrq  ROUT
 ; Keyboard receive interrupt
 
 ; We now have to wait around for a period of 16 microseconds (or so they say)
-; because the 'hardware engineers' can't design their hardware properly.
+; because of the hardware design.
 
 ; This is doubly annoying because I have no idea what speed this processor is
 ; going at, so I don't know how many S-cycles this is, and there aren't enough
@@ -236,9 +250,9 @@ KeyIrq  ROUT
 ; probably wasted at least 16 microseconds anyway - at least the code seems
 ; to work perfectly well without this delay loop.
 
-; Nevertheless, until the time Acorn can afford to employ some REAL
-; hardware engineers, I shall do a delay of (about) 16*8 S-cycles,
-; just to put their small minds at rest.
+; Nevertheless, until we can come up with a better solution, I shall do a
+; delay of (about) 16*8 S-cycles.
+;
 
         MOV     R0, #16*8/5             ; delay for an unspecified period
 IrqRxDelayLoop
@@ -322,7 +336,7 @@ OldKeyboardDispatch
         BEQ     ProcessOldKeyUp
         TEQ     R2, #SPDDONE            ; is it SPD data ?
         BEQ     ProcessOldSPDData
-        B       IrqBadRx                ; must be crap
+        B       IrqBadRx                ; spurious
 
 NewKeyboardDispatch
         TST     R2, #K1notmousedata     ; is it mouse data ?
@@ -333,7 +347,7 @@ NewKeyboardDispatch
         BEQ     ProcessNewKeyUp
         TEQ     R2, #K1pdat             ; is it SPD data ?
         BEQ     ProcessNewSPDData
-        B       IrqBadRx                ; must be crap
+        B       IrqBadRx                ; spurious
 
 
 ; *****************************************************************************

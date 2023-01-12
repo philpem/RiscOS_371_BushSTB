@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.VduGrafB
 ;
 ; ARTHUR OPERATING SYSTEM - Vdu Drivers
@@ -565,7 +579,7 @@ SectorSlice
         LDREQ R2,[WsPtr,#CLine0Far]
         BEQ HLine
 
-        CMP   R3,#&1E                           ; \-\ 
+        CMP   R3,#&1E                           ; \-\
         LDREQ R0,[WsPtr,#CLine1Far]
         LDREQ R2,[WsPtr,#CLine0Near]
         BEQ HLine
@@ -727,10 +741,10 @@ UpdateQuadr10
 ; ArcLineStep - Step line parameter block checking for interception
 ; ===========     with circle.
 ;
-;               Return first ('near') and last ('far') points of line 
+;               Return first ('near') and last ('far') points of line
 ;                 that fall on this scanline, limiting 'far' to the point on
-;                 the circle if interception occurs.          
-; 
+;                 the circle if interception occurs.
+;
 ; On entry, R0..R6 hold a line parameter block (EndX,EndY are not loaded)
 ;
 ; Format of a line control block
@@ -749,7 +763,7 @@ UpdateQuadr10
 ; On exit,  R0 (X), R1 (Y), R2 (bres) updated
 ;           R7 0/1/2 for within/on/outside circle
 ;           R8 nearX
-;       
+;
 ;
 ; R9,R10,R11 unused
 ;
@@ -785,12 +799,12 @@ ArcLineSt20                     ; this leaves us with farX,farY in R0,R1
 
         CMP R2,#0               ;If y about to change, return farX,farY
         BGE ArcLineSt20         ; else loop back to step the line
-        MOV R7,#0               
+        MOV R7,#0
         Return
 ;
 ;
 ;
-; Assumes  R9, R10 & R11 are not corrupted over calls to GenLineParm 
+; Assumes  R9, R10 & R11 are not corrupted over calls to GenLineParm
 ;
 ;
 GenArcParmBlk
@@ -855,7 +869,7 @@ GenArcParmBlk
         LDR R8,[WsPtr,#(CLine1+12)]
         MUL R9, R7, R8
 
-        CMP R0,R9                       ;For gradients <,>,= 
+        CMP R0,R9                       ;For gradients <,>,=
         ORRLT R9,R6,#&40                ; generate index into table
         ORRGT R9,R6,#&50
         ORREQ R9,R6,R6,LSL #2
@@ -1093,7 +1107,7 @@ DoubleMulDivSquareRoot ROUT
         BCS     %BT20
 
         BL      SquareRoot                      ; in: R7 = arg
-                                                ; out: R8 = result, R9-R11 crap
+                                                ; out: R8 = result, R9-R11 corrupt
         MOV     R3, R8
         Pull    "R8-R11,PC"
 

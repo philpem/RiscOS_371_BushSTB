@@ -1,3 +1,17 @@
+; Copyright 1996 Acorn Computers Ltd
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
 ; > $.Source.VduGrafC
 ;
 ; ARTHUR OPERATING SYSTEM - Vdu Drivers
@@ -48,13 +62,13 @@ EllipseOut20
         Least R4,R6,R10
         ADD R4,R4,#1
         Least R4,R4,R8          ; to min(thisR, min(prevR+1,nextR+1))
-                                
+
         BL EllDoubleHLine       ;Any overlap handled by EllDoubleHLine
 
         LDR R0,[WsPtr,#EllBlkSliceCnt]
         CMP R0,#0
         BGE EllipseOut10
-        B EllipseFi30           ;Use common code with ellipse fill for 
+        B EllipseFi30           ;Use common code with ellipse fill for
                                 ; last scanline
 ;
 ;
@@ -281,7 +295,7 @@ GenEllParm
         STR R9,[WsPtr,#EllThisL]        ;Limits passed back in R9,R10
         STR R10,[WsPtr,#EllThisR]
 
-        BL AdvEllP20 
+        BL AdvEllP20
 
         ADD R11,WsPtr,#EllThisL
         LDMIA R11,{R7,R8}
@@ -289,7 +303,7 @@ GenEllParm
         RSB R5,R10,#0                   ;prevL := -nextR
         RSB R6,R9,#0                    ;prevR := -nextL
 
-                                        ; Stretch slice if disconnected   
+                                        ; Stretch slice if disconnected
 
         Least R7,R7,R6                  ; thisL := min(thisL,prevR)
         Least R7,R7,R10                 ; thisL := min(thisL,nextR)
@@ -391,7 +405,7 @@ AdvEllP20
 
         SUB R7,R7,R1            ;Sqroot(MaxYSqr-EllYSqr)
         MOV R11,#24             ;Use 24 instead of 16 iterations in the
-        BL HellsTeeth           ; SquareRoot routine, gives result [0bb.b]
+        BL SquareRootAlt        ; SquareRoot routine, gives result [0bb.b]
 
                                 ;Mult by axis ratio
         MOV R7,R6               ; [0bb.b] * [0bb.b]

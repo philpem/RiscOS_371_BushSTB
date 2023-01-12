@@ -49,7 +49,7 @@ it didn't stand a chance of working anyway if you changed either flag.
 
 New Tim stuff : key up/down events, Con. monitortype does things.
 SWI to set handlers with workspace added : handlers yet to change.
-New fileswitch : buffering buggette buggered off
+New fileswitch : buffering buggette fixed
 
 Version .082
 ============
@@ -145,7 +145,7 @@ Reducing RMA / sysheap updates hpd proply.
 RMTidy tries to shrink RMA if tidy successful
 
 .09/e : Hard reset beep moved a bit more.
-.09/f : Stupid screensizes converted to as close to 20K as poss
+.09/f : Silly screensizes converted to as close to 20K as poss
         Optional 325 speed for a1 roms.
 .09/g : Reset initialises timer0 so can use CMOS RAM read write.
 .09/h : IOC Control set to FF on reset, new Tim code to do spastic things
@@ -286,9 +286,9 @@ RMTidy tries to shrink RMA if tidy successful
         Another (nastier) FileSwitch Opt 1,n bug fixed
         Module handler returns proper w'space contents for LookUpName
         Installing keyboard handler might work now says Tim
-        More bleeding FileSwitch changes. And yet more. Dump fixed.
+        More FileSwitch changes. And yet more. Dump fixed.
 1.20    another release, another number
-1.21    Oscli whinges about *net#arf:whassock etc.
+1.21    Oscli whinges about *net#arf:thing etc.
         *Modules counter doesn't wrap at 256 (and neither does *ROMModules)
         Module init failure: doesn't free incarnation node twice, and
         doesn't poo in the system heap.
@@ -477,8 +477,8 @@ RMTidy tries to shrink RMA if tidy successful
         Error returns for bad RMA heap claim/extend improved.
         RMA block extension needing RMA extension fixed.
         Doesn't corrupt end of physram on reset.
-        System heap not protected just because there are shitsuckers instead
-        of programmers out there.
+        System heap not protected just because there are idiots instead of
+        programmers out there.
         RMEnsure. SystemSpeed CMOS removed.
         Noo really dangerous FoolSwatch
 1.70    New title for release
@@ -522,7 +522,7 @@ RMTidy tries to shrink RMA if tidy successful
 1.73    Help terminates on escape.
         Autoboots if unrecognised keyboard too.
         New FileSwitch
-        CAM remapping don't piss with the interrupt state; caller must think
+        CAM remapping don't fiddle with the interrupt state; caller must think
         this through themselves.
         Default CMOS sez ArthurLib
         Added periods to end of configuration help where they were missing
