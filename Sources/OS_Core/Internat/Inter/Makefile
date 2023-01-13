@@ -82,6 +82,6 @@ rm.Inter: Hdr:ResourceFS
 rm.Inter: s.IntHelpTok
 rm.Inter: Hdr:Tokens
 rm.Inter: s.InterFonts
-s.IntHelp: IntHelpBod
+s.IntHelp: IntHelpBody
 s.IntHelp: Hdr:ListOpts
 s.IntHelp: Hdr:ModHand
