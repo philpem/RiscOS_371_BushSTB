@@ -21,7 +21,7 @@ GetCPU          SETS    ("GET Hdr:CPU." :CC: "$CPU_Type")
                 GBLS    IO_Type
 IO_Type         SETS    "IOMD"
                 GBLS    GetIO
-GetIO           SETS    ("GET Hdr:IO.IOMDL")
+GetIO           SETS    ("GET Hdr:IO." :CC: "$IO_Type")
 
 ; Video controller - does the sound too
                 GBLS    VIDC_Type

@@ -31,7 +31,7 @@ C_EXP_HDR = <cexport$dir>.Global.h
 #
 # Generic options:
 #
-MKDIR   = mkdir -p
+MKDIR   = cdir
 AS      = aasm
 CP      = copy
 RM      = remove

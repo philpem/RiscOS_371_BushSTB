@@ -315,8 +315,14 @@ Service_CCWordSpell3                    * &AF   ; Used by InterWord and SpellMas
 
 Service_InternetStatus                  * &B0   ; Issued by Internet module when address is configured
 
+Service_MachineAddress                  * &BD   ; ANC Steve Cormie
+
 Service_Sleeping                        * &B1   ; Online Media Set-Top Box
 Service_TimeShare                       * &B2   ; Alan Glover, Acorn, for SkyNet
+
+Service_PortMan                         * &C2   ; Neil Turton
+
+Service_NVRAM                           * &E0   ; Steve Cormie (This used to be isolated, but allocations have now caught up)
 
 ; Alias (should not be used)
 

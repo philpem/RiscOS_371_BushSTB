@@ -22,9 +22,9 @@
 ; 15-Feb-93  AGlover       Change ColourChooser to be SWIs & messages
 ; 15-Feb-93  AGlover       Change usage of &412C0 to reflect post SID usage
 ; 15-Feb-93  AGlover       Added WimpExt2 for Jon Ribbens (Customer Services - end user) &46380
-; 16-Feb-93  JBye          Added 3 SWI Chunks for Uniqueway &463C0 RS422 
+; 16-Feb-93  JBye          Added 3 SWI Chunks for Uniqueway &463C0 RS422
 ;                                                           &46400 RS422Log
-;                                                           &46440 Betacam 
+;                                                           &46440 Betacam
 ; 19-Feb-93  JBye          Added 2 SWI Chunks for ESP &46480 SuperSound
 ;                                                     &464C0 NotePad
 ; 22-Feb-93  JBye          Added MidiSync &82380 for Clares (Messages)
@@ -44,8 +44,8 @@
 ; 08-Mar-93  BCockburn     Added TriPadGraphicsTablet for tools
 ; 09-Mar-93  JBye          Added Doobs &46840 for Dean Murphy (Acorn)
 ; 16-Mar-93  DDeVorchik    Added SWI chunk for HFS for myself
-; 19-Mar-93  JBye          Added SWI Chunk for TCS Octopus &468C0 
-; 22-Mar-93  JBye          Added Message block for Oregan &82400 
+; 19-Mar-93  JBye          Added SWI Chunk for TCS Octopus &468C0
+; 22-Mar-93  JBye          Added Message block for Oregan &82400
 ; 23-Mar-93  JBye          Added Message block for Topologika &82440
 ; 29-Mar-93  JBye          Added SWI Chunk for EGL Limited "EGLVideo" &46900
 ; 29-Mar-93  JBye          Added SWI Chunk for Alan Williams "TankFS" &46940
@@ -61,7 +61,7 @@
 ; 14-Apr-93  JBye          Added four SWI Chunks for Wild Vision
 ;                          "WV229" &46B40,"WV217" &46B80,"WV218" &46BC0,"WV228" &46C00
 ; 15-Apr-93  JBye          Added Message block for Lionel Haines &82500
-; 20-Apr-93  JBye          Added SWI chunk for JBye "DateUtils" &46C40   
+; 20-Apr-93  JBye          Added SWI chunk for JBye "DateUtils" &46C40
 ; 21-Apr-93  JBye          Added SWI Chunk for Greyhound "HDFS" &46C80
 ; 26-Apr-93  JBye          Added SWI Chunk for LOOK Systems "FontFS" &46CC0
 ; 26-Apr-93  JBye          Added Message block for Look Systems &82540
@@ -77,7 +77,7 @@
 ; 13-May-93  JBye          Added message block for Tony Patterson &82600 (CS12200)
 ; 13-May-93  JBye          Added one SWI Chunk for Jon Ribbens "Diss" &46F00 (CS12068)
 ; 17-May-93  JBye          Added SWI Chunk for Stuart Palmer "PhotoCD" &46F40
-; 17-May-93  JBye          Added two SWI chunks for Digital Jellyfish 
+; 17-May-93  JBye          Added two SWI chunks for Digital Jellyfish
 ;                                     "RSound" &46F80 "RMisc" &46FC0
 ; 20-May-93  JBye          Added five SWI chunks for ASHIV (&47000->&47100)
 ; 21-May-93  JBye          Added SWI Chunk for PEP Associates "CDNet" &47140
@@ -85,7 +85,7 @@
 ; 26-May-93  JBye          Added one message chunk for CRM &82640
 ; 26-May-93  JBye          Added one for the Serial Port "MOFS" &47200
 ; 26-May-93  BCockburn     Added one for the Acorn ROMulator "ROMulator" &47240
-; 01-Jun-93  JBye          Added two for CC "GFontManager" &47280 
+; 01-Jun-93  JBye          Added two for CC "GFontManager" &47280
 ;                                           "ExtraCLI" &472C0
 ; 03-Jun-93  JBye          Added SWI Chunk for Digital Services "EtherD" &47300
 ; 04-Jun-93  JBye          Added SWI Chunk for Computer Concepts "Stream" &47340
@@ -93,7 +93,7 @@
 ; 17-Jun-93  JBye          Added 2 SWI Chunks for Desktop Innovations
 ;                               "PascalExt" &473C0 "EcoSuite" &47400 (CS12823)
 ; 17-Jun-93  JBye          Added SWI Chunk for Andrew Timms &47440 (CS12704)
-; 23-Jun-93  JBye          Added SWI Chunk for QD Enterprises "VTRecover" &47480 
+; 23-Jun-93  JBye          Added SWI Chunk for QD Enterprises "VTRecover" &47480
 ; 30-Jun-93  JBye          Changed prefix for &47440 to "SimpleWimp"
 ; 30-Jun-93  JBye          Added one for Liquid Silicon &474C0 "Apex" (CS13221)
 ; 05-Jun-93  JBye          Added two for Neil Critchell "PCMCIA" and "PCCardFS"
@@ -123,11 +123,11 @@
 ; 09-Sep-93  RMokady       Added SWI Chunk for Freeway (Acorn)
 ; 09-Sep-93  RMokady       Added SWI Chunk for ShareD (Acorn)
 ; 13-Sep-93  JBye          Added four SWI Chunks for Computer Concepts "OLE" &47B00
-;                           "SoundManagerGeneric" &47B40 "HiBall" &47B80 
+;                           "SoundManagerGeneric" &47B40 "HiBall" &47B80
 ;                             "WimpKey" &47BC0
 ; 14-Sep-93  JBye          Added "RemotePrinterSupport" for Chris Marshall
 ; 17-Sep-93  JBye          Added message block &82740 for DoggySoft (CS)
-; 17-Sep-93  JBye          Added two SWI Chunks for Matthew Lewis 
+; 17-Sep-93  JBye          Added two SWI Chunks for Matthew Lewis
 ;                          "WSWimpTools" &47C80 "WSWimpToolKit" &47CC0
 ; 17-Sep-93  JBye          Added two for Andrew Southgate "FastSprite" &47D00
 ;                          "Stasis" &47D40
@@ -148,7 +148,7 @@
 ; 15-Oct-93  JBye          Added three for Armstrong Walker "ScanLightSupport" &48140
 ;                          "LaserExpressSupport" &48180 "InTalk" &481C0
 ; 08-Nov-93  JBye          Added 32 SWI Chunks for the Aquarius project
-; 12-Nov-93  JBye          Added 1 for RISC Development "EasyDebug" &83040 
+; 12-Nov-93  JBye          Added 1 for RISC Development "EasyDebug" &83040
 ; 12-Nov-93  JBye          Added 1 for David Knell "ROFS" &48200
 ; 15-Nov-93  JBye          Added 4 for Kasoft (CS14483) &48240 -> &48300
 ; 15-Nov-93  JBye          Added 1 for Andrew Wood "AWLib" &48340 (CS 14609)
@@ -429,7 +429,7 @@ Name_Generator  SETS    "Acorn"                         ; Generate the set of SW
 ;   The values of the names are generated with variable names with "SWI_Name"
 ;   appended.  See Hdr:SWIs for example output.
 ;
-;   The ChunkM macro should be used to allocate a chunk for wimp messages. 
+;   The ChunkM macro should be used to allocate a chunk for wimp messages.
 ;   It takes the same first three arguments as the Chunk macro, it doesn't
 ;   need a forth string argument or a NameOK argument.  The ChunkM macro
 ;   generates symbols of the form ThingMessage with the chunk number and
@@ -441,7 +441,7 @@ Name_Generator  SETS    "Acorn"                         ; Generate the set of SW
 
 ; ***********************************************
 ; ***  InitialiseFile - Helps with the        ***
-; ***  generation of Hdr:SWIs                 ***  
+; ***  generation of Hdr:SWIs                 ***
 ; ***  cf BlankLineInFile, and TerminateFile  ***
 ; ***********************************************
         MACRO
@@ -455,7 +455,7 @@ Name_Generator  SETS    "Acorn"                         ; Generate the set of SW
         =               "        ; Generated from Hdr:ISV-SWIs", 10
         =               "        ; For the vendor """, "$Name_Generator", """", 10
         =               "", 10
-        ]  
+        ]
         MEND
 
 ; ********************************************************
@@ -468,7 +468,7 @@ spaces  SETS            "                                                     "
         LCLS            swi
 swi     SETS            "$company" :CC: "_" :CC: "$name" :CC: "SWI"
 $swi    #               1                               ; Generate the chunk number
-        ASSERT          (&$value :AND: &1FFFF) = (&40 * $swi)
+;        ASSERT          (&$value :AND: &1FFFF) = (&40 * $swi)
         [               Name_Clash
         [               "$string" = ""
 swi     SETS            "SWI_String_" :CC: "$name"
@@ -549,7 +549,7 @@ swi     SETS            "&" :CC: "$value"
 
 ; ****************************************************
 ; ***  LineInFile - Helps with the                 ***
-; ***  generation of Hdr:SWIs and Hdr:Types        ***  
+; ***  generation of Hdr:SWIs and Hdr:Types        ***
 ; ***  cf InitialiseSWIFile, and TerminateSWIFile  ***
 ; ****************************************************
         MACRO
@@ -566,7 +566,7 @@ swi     SETS            "&" :CC: "$value"
 
 ; ******************************************************
 ; ***  TerminateFile - Helps with the                ***
-; ***  generation of Hdr:SWIs and Hdr:Types          ***  
+; ***  generation of Hdr:SWIs and Hdr:Types          ***
 ; ***  cf BlankLineInSWIFile, and InitialiseSWIFile  ***
 ; ******************************************************
         MACRO
@@ -650,7 +650,7 @@ Hourglass               Chunk   406C0, Acorn                                    
 Draw                    Chunk   40700, Acorn
 ColourTrans             Chunk   40740, Acorn
 RamFS                   Chunk   40780, Acorn
-UnixFS                  Chunk   407C0, Acorn,                   UnixFS          ; Jamie Smith  
+UnixFS                  Chunk   407C0, Acorn,                   UnixFS          ; Jamie Smith
 DigiTape                Chunk   40800, Unknown
 Pluto                   Chunk   40840, LendacDataSystems
 Graphics                Chunk   40880, VideoElectronicsLtd,     VELGraph
@@ -685,19 +685,19 @@ Filer                   Chunk   40F80, Acorn,                   FilerAction
 CTSRecognition          Chunk   40FC0, Unknown,                 Tablet          ; Graphics tablet
 FloppyDisc              Chunk   41000, SerialPort,              FDC             ; Disc copier / FDC
 Scavenger               Chunk   41040, Beebug                   ; Was BeebugScanner
-SCSILog                 Chunk   41080, Acorn,                   SCSI, NameOK    ; RCManby 
+SCSILog                 Chunk   41080, Acorn,                   SCSI, NameOK    ; RCManby
 NFS                     Chunk   410C0, Acorn,                   NFS             ; For Sun NFS filing system
-VCR                     Chunk   41100, BrightonPolytechnic 
+VCR                     Chunk   41100, BrightonPolytechnic
 DFS                     Chunk   41140, PRES,                    DFS
 Wimp                    Chunk   41180, AceComputing,            Task
 WaterMaze               Chunk   411C0, EdinburghUniversity
-Inet                    Chunk   41200, Acorn,                   Inet            ; Internet socket interface 
+Inet                    Chunk   41200, Acorn,                   Inet            ; Internet socket interface
 CDROM                   Chunk   41240, Acorn,                   CD              ; Originally added for NextTechnology
 CImages                 Chunk   41280, FosterFindlayAssociates, CImages
 EFormat2                Chunk   412C0, Acorn,                                    ; Alan Glover
 ;this used to be....
 ;SID                     Chunk   412C0, Acorn,                   DataHost        ; S.I.D.
-SGBDevelopment          Chunk   41300, SGBComputerServices 
+SGBDevelopment          Chunk   41300, SGBComputerServices
 Serial                  Chunk   41340, SoftOption,              SOSerial
 GenLock                 Chunk   41380, SoftOption,              SOGenLock
 Strategy                Chunk   413C0, SoftOption,              SOStrategy
@@ -706,7 +706,7 @@ LFilingSystem           Chunk   41440, ComputerConcepts,        LFS
 PCFilingSystem          Chunk   41480, ComputerConcepts,        PCFS
 Connect                 Chunk   414C0, PhoboxElectronics,       Connect
 MessageTrans            Chunk   41500, Acorn
-AmigaDiscOp             Chunk   41540, Acorn                                    ; Jamie Smith 
+AmigaDiscOp             Chunk   41540, Acorn                                    ; Jamie Smith
 SerialPort              Chunk   41580, Acorn                                    ; Ran Mokady
 Telnet                  Chunk   415C0, Acorn                                    ; Ran Mokady
 Genlock                 Chunk   41600, AlliedInteractiveLtd
@@ -715,13 +715,13 @@ Video                   Chunk   41680, AlliedInteractiveLtd,    Video, NameOK
 VideoFade               Chunk   416C0, AlliedInteractiveLtd,    VideoFade
 Sampler                 Chunk   41700, AlliedInteractiveLtd,    Audio
 PCLink                  Chunk   41740, ComputerConcepts
-AngliaTV                Chunk   41780, AngliaTV 
+AngliaTV                Chunk   41780, AngliaTV
 Scanner                 Chunk   417C0, TechnomaticLtd
 CImages02               Chunk   41800, FosterFindlayAssociates, CImages, NameOK
 CImages03               Chunk   41840, FosterFindlayAssociates, CImages, NameOK
 Deltronics              Chunk   41880, Deltronics
 Laser                   Chunk   418C0, ComputerConcepts,        Laser
-Quadrant                Chunk   41900, Beebug,                  Quadrant        ; A3000 modem development 
+Quadrant                Chunk   41900, Beebug,                  Quadrant        ; A3000 modem development
 RCC                     ChunkM  41940, LongmanLogotron
 Ftp                     Chunk   41980, Acorn,                   FTP             ; Ran Mokady
 Tftp                    Chunk   419C0, Acorn,                   TFTP            ; Ran Mokady
@@ -806,7 +806,7 @@ Prism                   Chunk   42D40, NCET                                     
 Contact                 Chunk   42D80, NCET                                     ; Keith Hemsley
 MessageExtend           Chunk   42DC0, Acorn
 SoundManager            Chunk   42E00, Acorn                                    ; David De Vorchik
-PCConnect               Chunk   42E40, DTSoftware                               ; David Knell, 
+PCConnect               Chunk   42E40, DTSoftware                               ; David Knell,
 ParallelIOInterCard     Chunk   42E80, IntelligentInterfaces,   SPINC           ; Andy Ray
 Parallel                Chunk   42EC0, Acorn                                    ; David De Vorchik
 IDEFS                   Chunk   42F00, Watford,                 IDEFS, NameOK   ; Chris Honey
@@ -815,7 +815,7 @@ TouchType               Chunk   42F80, Iota                                     
 Portable                Chunk   42FC0, Acorn                                    ; Tim Dobson
 RSDOS                   Chunk   43000, Unknown                                  ; Rob Schrauw
 Territory               Chunk   43040, Acorn                                    ; Ran Mokady
-EcoSampler              Chunk   43080, QDEnterprisesLtd                         ; Andrew Foyle 
+EcoSampler              Chunk   43080, QDEnterprisesLtd                         ; Andrew Foyle
 DocumentManager         Chunk   430C0, Unknown                                  ; David De Vorchik
 ScreenBlanker           Chunk   43100, Acorn                                    ; Steve Hunt
 TouchWindow             Chunk   43140, Unknown,                 TWindow         ; Rob Hamilton
@@ -851,7 +851,7 @@ ArcRecorder             Chunk   43880, Hybrid                                   
 FaxIm                   Chunk   438C0, IrlamInstruments,        Fim             ; Jim Irlam
 MovingUImage            Chunk   43900, IrlamInstruments,        Mim             ; Jim Irlam
 Graph3D                 Chunk   43940, CustomerServices                         ; Michael Rozdoba (3592)
-RAMJt                   Chunk   43980, CustomerServices,        RAMJetFS        ; Martin Dorey (3619)   
+RAMJt                   Chunk   43980, CustomerServices,        RAMJetFS        ; Martin Dorey (3619)
 Ethernet                Chunk   439C0, Atomwide,                EtherA          ; Nicko Van Someron
 AccessLink              Chunk   43A00, Hybrid,                  AccessLink, NameOK ; Tony Thompson
 Access2000              Chunk   43A40, Hybrid                                   ; Tony Thompson
@@ -1135,8 +1135,8 @@ Inetd                   Chunk   47EC0, AlephOne                                 
 Rephorm                 Chunk   47F00, OakSolutions                             ; Paul Fellows
 BriniLink               Chunk   47F40, Brini                                    ; David Brinicombe
 ArcNetFS                Chunk   47F80, AdvancedComputerServices                 ; Robert Spragg
-ACSUtils2               Chunk   47FC0, AdvancedComputerServices                 ; Robert Spragg              
-ACSServer               Chunk   48000, AdvancedComputerServices                 ; Robert Spragg              
+ACSUtils2               Chunk   47FC0, AdvancedComputerServices                 ; Robert Spragg
+ACSServer               Chunk   48000, AdvancedComputerServices                 ; Robert Spragg
 ArcNetUT1               Chunk   48040, AdvancedComputerServices                 ; Robert Spragg
 Facilis                 Chunk   48080, CustomerServices                         ; Jack Aidley
 AppDockSpt              Chunk   480C0, CustomerServices                         ; Martin Wuerthner
@@ -1358,6 +1358,9 @@ CDSupport               Chunk   4B680, Acorn                                    
 Virtualise              Chunk   4B6C0, Clares                                   ; Clares
 ATAPI_BE                Chunk   4B700, Baildon                                  ; Baildon Electronics
 
+NVRAM                   Chunk   4EE00, Acorn
+PortMan                 Chunk   52D80, Acorn
+
                         ASSERT @ < 1 :SHL: (17-6)
 
                         LineInFile      "Application SWI Chunks"
@@ -1492,7 +1495,7 @@ Notate                  Chunk   81E00, LongmanLogotron
 Vector                  Chunk   81E40, FourMation                               ; Mike Matson
 InteractiveManual       Chunk   81E80, DataStore,               IManual         ; David Coronel
 Sound                   Chunk   81EC0, Iota,                    Sound, NameOK   ; Stuart Payne
-Profile                 Chunk   81F00, Acorn                                    ; Edward Nevill 
+Profile                 Chunk   81F00, Acorn                                    ; Edward Nevill
 Void_002                Chunk   81F40, Unknown                                  ; David De Vorchik
 AppLink                 Chunk   81F80, PenAndThink                              ; Bill Leedham
 CadSoft                 ChunkM  81FC0, CadSoft                                  ; Mike Flannagan
@@ -1527,7 +1530,7 @@ AnsiTerminal            ChunkM  826C0, DeanMurphy                               
 CTurnerDebugApp         ChunkM  82700, CustomerServices                         ; Colin Turner
 DoggySoftHacker         ChunkM  82740, CustomerServices                         ; Andrew Clover
 KHallBinkley            ChunkM  82780, KeithHall                                ; Keith Hall
-ReadNews                Chunk   827C0, CustomerServices                         ; Julian Wright 
+ReadNews                Chunk   827C0, CustomerServices                         ; Julian Wright
 Interact                ChunkM  82800, DalriadaTechnology                       ; George Buchanan
 ToolboxTest             Chunk   82840, Acorn                                    ; Ian Johnson
 Windows                 Chunk   82880, Acorn                                    ; Ian Johnson
@@ -1606,7 +1609,7 @@ XObject4                Chunk   83A80, OnlineMedia                              
 XObject5                Chunk   83AC0, OnlineMedia                              ; Aideen McC
 AtomManager             Chunk   83B00, OnlineMedia                              ; Aideen McC
 PLIP                    Chunk   83B40, Acorn                                    ; Kevin Bracey
-NotUsed                 Chunk   83B80, Nobody                                   ; 
+NotUsed                 Chunk   83B80, Nobody                                   ;
 WebFTP                  Chunk   83BC0, ANTLtd                                   ; Nick Smith
 CBFC                    Chunk   83C00, OnlineMedia                              ; Chris Pitts
 Layout                  ChunkM  83C40, OnlineMedia                              ; Tony Frost

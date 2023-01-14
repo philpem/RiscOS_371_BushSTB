@@ -50,6 +50,7 @@ EXPORTS   = \
  ${HDRDIR}.Heap \
  ${HDRDIR}.ImageSize.2048K \
  ${HDRDIR}.ImageSize.4096K \
+ ${HDRDIR}.ImageSize.8192K \
  ${HDRDIR}.IO.GenericIO \
  ${HDRDIR}.IO.IOC \
  ${HDRDIR}.IO.IOC-A1 \
@@ -60,6 +61,7 @@ EXPORTS   = \
  ${HDRDIR}.ListOpts \
  ${HDRDIR}.MEMM.ARM600 \
  ${HDRDIR}.MEMM.MEMC1 \
+ ${HDRDIR}.Machine.Lazarus \
  ${HDRDIR}.Machine.Jordan \
  ${HDRDIR}.Machine.Morris \
  ${HDRDIR}.Macros \
@@ -145,10 +147,12 @@ ${HDRDIR}.Services: Register.Services;         ${CP} Register.Services $@ ${CPFL
 ${HDRDIR}.UpCall: Register.UpCall;             ${CP} Register.UpCall $@ ${CPFLAGS}
 
 # Machine/hardware specific headers:
+${HDRDIR}.Machine.Lazarus: hdr.Machine.Lazarus;  ${CP} hdr.Machine.Lazarus $@ ${CPFLAGS}
 ${HDRDIR}.Machine.Jordan: hdr.Machine.Jordan;  ${CP} hdr.Machine.Jordan $@ ${CPFLAGS}
 ${HDRDIR}.Machine.Morris: hdr.Machine.Morris;  ${CP} hdr.Machine.Morris $@ ${CPFLAGS}
 ${HDRDIR}.ImageSize.2048K: hdr.ImageSize.2048K; ${CP} hdr.ImageSize.2048K $@ ${CPFLAGS}
 ${HDRDIR}.ImageSize.4096K: hdr.ImageSize.4096K; ${CP} hdr.ImageSize.4096K $@ ${CPFLAGS}
+${HDRDIR}.ImageSize.8192K: hdr.ImageSize.8192K; ${CP} hdr.ImageSize.8192K $@ ${CPFLAGS}
 ${HDRDIR}.CPU.ARM600: hdr.CPU.ARM600;          ${CP} hdr.CPU.ARM600 $@ ${CPFLAGS}
 ${HDRDIR}.CPU.Generic26: hdr.CPU.Generic26;    ${CP} hdr.CPU.Generic26 $@ ${CPFLAGS}
 ${HDRDIR}.FDC.FDC711: hdr.FDC.FDC711;          ${CP} hdr.FDC.FDC711 $@ ${CPFLAGS}

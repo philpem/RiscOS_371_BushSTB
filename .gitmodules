@@ -1,0 +1,6 @@
+[submodule "Sources/OS_Core/HWSupport/NVRAM"]
+	path = Sources/OS_Core/HWSupport/NVRAM
+	url = https://gitlab.riscosopen.org/RiscOS/Sources/HWSupport/NVRAM.git
+[submodule "Sources/OS_Core/HWSupport/PortMan"]
+	path = Sources/OS_Core/HWSupport/PortMan
+	url = https://gitlab.riscosopen.org/RiscOS/Sources/HWSupport/PortMan.git

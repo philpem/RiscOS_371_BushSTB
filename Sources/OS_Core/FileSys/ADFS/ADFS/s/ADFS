@@ -16,6 +16,8 @@ ARM810support SETL {FALSE}
         GET     Hdr:CMOS
         GET     Hdr:Services
         GET     Hdr:ModHand
+	GET	Hdr:Machine.<Machine>
+	$GetIO
         GET     Hdr:PublicWS
         GET     Hdr:Tokens
         GET     Hdr:UpCall
