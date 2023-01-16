@@ -11,7 +11,7 @@ set Machine    Jordan
 set System     Jordan
 set ImageSize  4096K
 |
-set alias$amu_machine amu MACHINE=<Machine> LOCALE=<Locale> SYSTEM=<System> 
+set alias$amu_machine amu MACHINE=<Machine> LOCALE=<Locale> SYSTEM=<System> %*0
 |
 set Build$Dir      <Obey$Dir>
 set Run$Path       ,<Build$Dir>.Library.
