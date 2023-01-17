@@ -9,13 +9,14 @@
 # 28-Jul-94  AMcC   removed build rules for h.swis (done by RISC_OSLib)
 # 11-Aug-94  AMcC   Don't create an Arthur directory in Export.Hdr.Global
 # 19-Oct-94  AMcC   Export ImageSize hdrs
-# 31-Oct-94  AMcC   Export IO.IOMDL (IOMD for Morris)    
+# 31-Oct-94  AMcC   Export IO.IOMDL (IOMD for Morris)
 #
 
 #
 # Paths
 #
 HDRDIR = <hdr$dir>.Global
+HDIR   = <CExport$dir>
 
 # Generic options:
 #
@@ -24,6 +25,8 @@ AS       = aasm
 CP       = copy
 RM       = remove
 TOKENISE = tokenise
+PERL     = perl
+HDR2H    = ${PERL} <Tools$Dir>.Build.Hdr2H
 
 CFLAGS   = -c -depend !Depend -IC:
 AFLAGS   = -depend !Depend -stamp -quit
@@ -61,8 +64,8 @@ EXPORTS   = \
  ${HDRDIR}.ListOpts \
  ${HDRDIR}.MEMM.ARM600 \
  ${HDRDIR}.MEMM.MEMC1 \
- ${HDRDIR}.Machine.Lazarus \
  ${HDRDIR}.Machine.Jordan \
+ ${HDRDIR}.Machine.Lazarus \
  ${HDRDIR}.Machine.Morris \
  ${HDRDIR}.Macros \
  ${HDRDIR}.Messages \
@@ -82,7 +85,9 @@ EXPORTS   = \
  ${HDRDIR}.Tokens \
  ${HDRDIR}.UpCall \
  ${HDRDIR}.VIDC.VIDC1a \
- ${HDRDIR}.VIDC.VIDC20
+ ${HDRDIR}.VIDC.VIDC20 \
+ ${HDIR}.Global.h.Services \
+ ${HDIR}.Global.h.SWIs
 
 #
 # Derived hdr files
@@ -104,6 +109,9 @@ Dirs:
         ${MKDIR} <build$dir>.Export.Hdr
         ${MKDIR} <build$dir>.Export.Hdr.Global
         ${MKDIR} <build$dir>.Export.Hdr.Interface
+        ${MKDIR} <build$dir>.Export.C
+        ${MKDIR} <build$dir>.Export.C.Global
+        ${MKDIR} <build$dir>.Export.C.Global.h
         ${MKDIR} ${HDRDIR}.CPU
         ${MKDIR} ${HDRDIR}.FDC
         ${MKDIR} ${HDRDIR}.IO
@@ -124,11 +132,11 @@ clean:
 # Rules for deriving headers:
 #
 ${FILETYPES}: Register.ISV-Types s.DoTypes
-        ${AS} ${AFLAGS} -from s.DoTypes -to $@ 
+        ${AS} ${AFLAGS} -from s.DoTypes -to $@
         settype $@ text
 
 ${SWIS}: Register.ISV-SWIs s.DoSWIs
-        ${AS} ${AFLAGS} -from s.DoSWIs -to $@ 
+        ${AS} ${AFLAGS} -from s.DoSWIs -to $@
         settype $@ text
 
 #
@@ -145,6 +153,10 @@ ${HDRDIR}.PoduleReg: Register.PoduleReg;       ${CP} Register.PoduleReg $@ ${CPF
 ${HDRDIR}.NewErrors: Register.NewErrors;       ${CP} Register.NewErrors $@ ${CPFLAGS}
 ${HDRDIR}.Services: Register.Services;         ${CP} Register.Services $@ ${CPFLAGS}
 ${HDRDIR}.UpCall: Register.UpCall;             ${CP} Register.UpCall $@ ${CPFLAGS}
+
+# C versions of registration headers
+${HDIR}.Global.h.Services: ${HDRDIR}.Services; ${HDR2H} ${HDRDIR}.Services $@
+${HDIR}.Global.h.SWIs:     ${HDRDIR}.SWIs;     ${HDR2H} ${HDRDIR}.SWIs     $@
 
 # Machine/hardware specific headers:
 ${HDRDIR}.Machine.Lazarus: hdr.Machine.Lazarus;  ${CP} hdr.Machine.Lazarus $@ ${CPFLAGS}
