@@ -11,7 +11,7 @@ set Machine    Morris
 set System     Morris2
 set ImageSize  2048K
 |
-set alias$amu_machine amu MACHINE=<Machine> LOCALE=<Locale> SYSTEM=<System> 
+set alias$amu_machine amu MACHINE=<Machine> LOCALE=<Locale> SYSTEM=<System> %*0
 |
 set Build$Dir      <Obey$Dir>
 set Apps$Path      <Build$Dir>.Apps.
