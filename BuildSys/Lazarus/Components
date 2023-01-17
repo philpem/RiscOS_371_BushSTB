@@ -31,7 +31,7 @@ ToolboxMF             EXP     Import.Aquarius
 Podule                ASM     OS_Core.HWSupport.Podule                   ROM.OS_Core          Podule
 FileSwitch            ASM     OS_Core.FileSys.FileSwitch                 ROM.OS_Core          FileSwitch
 ResourceFS            ASM     OS_Core.FileSys.ResourceFS.ResourceFS      ROM.OS_Core          ResourceFS
-Messages              ASM     OS_Core.Internat.Messages                  ROM.STB   4          Messages
+Messages              ASM     OS_Core.Internat.Messages                  ROM.Lazarus          Messages
 MessageTrans          ASM     OS_Core.Internat.MsgTrans                  ROM.OS_Core          MsgTrans
 TerritoryManager      ASM     OS_Core.Internat.Territory.Manager         ROM.OS_Core          TerrMgr
 UK                    ASM     OS_Core.Internat.Territory.UK              ROM.OS_Core          UK
