@@ -70,6 +70,13 @@ UpCall_StreamClosed     # 1      ;11       ; stream has been removed
 UpCall_Freeway          # 1      ;12      ; Freeway object created / modified.
 UpCall_Online           # 1      ;13       ; Online Media Set-Top Box
 UpCall_Standby          # 1      ;14       ; Online Media Set-Top Box
+UpCall_DeviceRxDataPresent # 1   ;15      ; Acorn NC
+UpCall_DeviceThresAbove    # 1   ;16      ; Acorn NC
+UpCall_DeviceThresBelow    # 1   ;17      ; Acorn NC
+UpCall_ProgressUI       # 1      ;18      ; ANC OLove
+UpCall_MediaSearchEndMessage # 1 ;19      ; Acorn Alastair Rodger
+UpCall_KeyboardStatus   # 1      ; 20     ; Acorn Kevin Bracey
+UpCall_MPEG             # 1      ; 21     ; Acorn Ben Avison
 
 ; MOS UpCalls
                         ^ 256

@@ -810,6 +810,16 @@ CDSupportSWI                    EQU     &000002DA
 CDSupportSWI_Base               EQU     &0004B680
 CDSupportSWI_Name               SETS    "CDSupport"
 
+                                GBLS    NVRAMSWI_Name
+NVRAMSWI                        EQU     &000002DD
+NVRAMSWI_Base                   EQU     &0004EE00
+NVRAMSWI_Name                   SETS    "NVRAM"
+
+                                GBLS    PortManSWI_Name
+PortManSWI                      EQU     &000002DE
+PortManSWI_Base                 EQU     &00052D80
+PortManSWI_Name                 SETS    "PortMan"
+
 
         ; Application SWI Chunks
 

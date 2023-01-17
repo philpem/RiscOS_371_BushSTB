@@ -9,7 +9,7 @@
 # Kernel must be first component in list followed by "ROMImage"
 #
 Kernel                Kernel  OS_Core.Kernel                             ROM.Lazarus          Kernel
-ROMImage              8192    STB8.ROMImage                           Images               8MEG
+ROMImage              8192    Lazarus.ROMImage                           Images               8MEG
 #
 # Non-installed components (these build and export headers or libraries)
 #
@@ -112,8 +112,9 @@ ColourPicker          C       OS_Core.Video.UserI.Picker                 ROM.OS_
 ScreenModes           C       OS_Core.Video.UserI.ScrModes               ROM.OS_Core          ScrModes
 DrawFile              C       OS_Core.Video.Render.DrawFile              ROM.OS_Core          DrawFile
 BootCommands          C       OS_Core.BootCmds                           ROM.OS_Core          BootCmds
-PortMan               ASM     OS_Core.HWSupport.PortMan                  ROM.PortManager       PortMan
-NVRAM                 ASM     OS_Core.HWSupport.NVRAM                    ROM.OS_Core          NVRAM
+PortMan               C       OS_Core.HWSupport.PortMan                  ROM.PortManager      PortMan
+NVRAM                 C       OS_Core.HWSupport.NVRAM                    ROM.OS_Core          NVRAM
+
 #-----------------------------------------------------------------------------------------------------------
 # PCMCIA
 #-----------------------------------------------------------------------------------------------------------
