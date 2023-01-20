@@ -1597,7 +1597,7 @@ err_buffoverflow
         MOV     r1, #0                                  ; Force the global case
         MOV     r2, #0
         SWI     XMessageTrans_ErrorLookup
-        Pull    "pc"
+        Pull    "r1, r2, pc"
 
 ErrorBlock_BuffOverflow
         DCD     ErrorNumber_CDATBufferOverflow
