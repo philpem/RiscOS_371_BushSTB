@@ -133,7 +133,7 @@ Net                   C       Networking.AUN.Net                         ROM.Net
 BootNet               ASM     Networking.AUN.BootNet                     ROM.Networking       BootNet
 Freeway               C       Networking.AUN.Access.Freeway              ROM.Networking       Freeway
 ShareFS               C       Networking.AUN.Access.ShareFS.ShareFS      ROM.Networking       ShareFS
------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------
 # Apps
 #-----------------------------------------------------------------------------------------------------------
 Edit                  C       Apps.Edit                                  ROM.Apps             Edit
@@ -179,16 +179,16 @@ Scale                 C       Import.Aquarius.tbox.Scale                 ROM.Too
 #-----------------------------------------------------------------------------------------------------------
 # CDFS
 #-----------------------------------------------------------------------------------------------------------
-CDFSResources         ASM     OS_Core.FileSys.CDFS.CDFSRes               ROM.CD               CDFSRes
-CDFSDriver            ASM     OS_Core.HWSupport.CD.CDFSDriver            ROM.CD               CDFSDriver
-ATAPI                 ASM     OS_Core.HWSupport.CD.ATAPI                 ROM.CD               ATAPI
-Chinon                ASM     OS_Core.HWSupport.CD.Chinon                ROM.CD               Chinon
-Hitachi               ASM     OS_Core.HWSupport.CD.Hitachi               ROM.CD               Hitachi
-Philips               ASM     OS_Core.HWSupport.CD.Philips               ROM.CD               Philips
-Sony                  ASM     OS_Core.HWSupport.CD.Sony                  ROM.CD               Sony
-Toshiba               ASM     OS_Core.HWSupport.CD.Toshiba               ROM.CD               Toshiba
-CDFS                  ASM     OS_Core.FileSys.CDFS.CDFS                  ROM.CD               CDFS
-CDFSFiler             ASM     OS_Core.FileSys.CDFS.CDFSFiler             ROM.CD               CDFSFiler
+#CDFSResources         ASM     OS_Core.FileSys.CDFS.CDFSRes               ROM.CD               CDFSRes
+#CDFSDriver            ASM     OS_Core.HWSupport.CD.CDFSDriver            ROM.CD               CDFSDriver
+#ATAPI                 ASM     OS_Core.HWSupport.CD.ATAPI                 ROM.CD               ATAPI
+#Chinon                ASM     OS_Core.HWSupport.CD.Chinon                ROM.CD               Chinon
+#Hitachi               ASM     OS_Core.HWSupport.CD.Hitachi               ROM.CD               Hitachi
+#Philips               ASM     OS_Core.HWSupport.CD.Philips               ROM.CD               Philips
+#Sony                  ASM     OS_Core.HWSupport.CD.Sony                  ROM.CD               Sony
+#Toshiba               ASM     OS_Core.HWSupport.CD.Toshiba               ROM.CD               Toshiba
+#CDFS                  ASM     OS_Core.FileSys.CDFS.CDFS                  ROM.CD               CDFS
+#CDFSFiler             ASM     OS_Core.FileSys.CDFS.CDFSFiler             ROM.CD               CDFSFiler
 #-----------------------------------------------------------------------------------------------------------
 # Extras for 3.70
 #-----------------------------------------------------------------------------------------------------------
