@@ -14,7 +14,7 @@ set ImageSize  4096K
 set alias$amu_machine amu MACHINE=<Machine> LOCALE=<Locale> SYSTEM=<System> %*0
 |
 set Build$Dir      <Obey$Dir>
-set Run$Path       ,<Build$Dir>.Library.
+set Run$Path       ,<Build$Dir>.Library.,Perl:
 set Tools$Dir      <Build$Dir>.Library
 |
 rmensure DDEUtils 1.50 rmload <Tools$Dir>.DDEUtils

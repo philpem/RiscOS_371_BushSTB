@@ -4,3 +4,6 @@
 [submodule "Sources/OS_Core/HWSupport/PortMan"]
 	path = Sources/OS_Core/HWSupport/PortMan
 	url = https://github.com/philpem/RO371_BushIBX_PortMan.git
+[submodule "!Perl"]
+	path = !Perl
+	url = https://gitlab.riscosopen.org/RiscOS/Apps/PlingPerl.git

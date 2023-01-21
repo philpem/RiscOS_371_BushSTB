@@ -16,7 +16,7 @@ set alias$amu_machine amu MACHINE=<Machine> LOCALE=<Locale> SYSTEM=<System> %*0
 |
 set Build$Dir      <Obey$Dir>
 set Apps$Path      <Build$Dir>.Apps.
-set Run$Path       ,<Build$Dir>.Library.,<Apps$Path>
+set Run$Path       ,<Build$Dir>.Library.,<Apps$Path>,Perl:
 set BASIC$Path     <Build$Dir>.Library.
 set Tools$Dir      <Build$Dir>.Library
 |
